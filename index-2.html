@@ -59,17 +59,6 @@ input,textarea{font-family:inherit;color:inherit}
 
 /* ============ HOME ============ */
 .lead{color:var(--muted);font-size:14.5px;margin:-6px 0 20px}
-.review-all{display:flex;align-items:center;gap:12px;width:100%;text-align:left;position:relative;overflow:hidden;
-  background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);
-  padding:16px 18px 16px 22px;margin-bottom:18px;box-shadow:var(--shadow);transition:transform .12s}
-.review-all:active{transform:scale(.985)}
-.review-all::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--t1),var(--t3),var(--t4))}
-.review-all .ra-t{font-weight:680;font-size:16.5px;letter-spacing:-.01em}
-.review-all .ra-s{color:var(--muted);font-size:13px;margin-top:3px}
-.review-all .chip{margin-left:auto;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;
-  background:var(--surface-3);color:var(--muted);white-space:nowrap}
-.review-all .chip.due{background:color-mix(in srgb,var(--t1) 16%,transparent);color:var(--t1)}
-.review-all .chip.done{background:color-mix(in srgb,var(--t2) 16%,transparent);color:var(--t2)}
 .deck{display:block;width:100%;text-align:left;background:var(--surface);
   border:1px solid var(--hairline);border-radius:var(--radius);padding:16px 18px;
   margin-bottom:12px;box-shadow:var(--shadow);transition:transform .12s ease, box-shadow .12s}
@@ -162,55 +151,6 @@ input,textarea{font-family:inherit;color:inherit}
 .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:14px}
 .legend span{font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;font-weight:600}
 .legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
-
-/* ---- exercise: choice & build ---- */
-.q-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;background:var(--surface);border:1px solid var(--hairline);border-radius:24px;
-  box-shadow:var(--shadow);padding:30px 22px;margin:8px 0 6px;min-height:150px}
-.q-prompt.build{min-height:120px;padding:24px 22px}
-.q-prompt .hz-big{font-family:var(--han);font-weight:500;font-size:clamp(46px,13vw,72px);line-height:1.05}
-.q-prompt .py-big{font-size:clamp(17px,4.6vw,22px);font-weight:600;margin-top:14px;display:flex;gap:.4em;flex-wrap:wrap;justify-content:center}
-.q-prompt .ru-big{font-size:clamp(22px,6.4vw,30px);font-weight:660;line-height:1.25;letter-spacing:-.01em}
-.q-prompt .py-hint{font-size:15px;font-weight:600;margin-top:12px;opacity:.85;display:flex;gap:.4em;flex-wrap:wrap;justify-content:center}
-.q-label{text-align:center;color:var(--muted);font-size:12.5px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.07em;margin:14px 0 12px}
-
-.options{display:grid;gap:10px}
-.options.cols2{grid-template-columns:1fr 1fr}
-.options.col1{grid-template-columns:1fr}
-.opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  background:var(--surface);border:1.5px solid var(--hairline);border-radius:16px;
-  padding:16px 14px;min-height:62px;transition:transform .1s,border-color .15s,background .15s}
-.opt:active{transform:scale(.97)}
-.opt[disabled]{pointer-events:none}
-.opt .o-hz{font-family:var(--han);font-size:24px;font-weight:500;line-height:1.1}
-.opt .o-py{font-size:13px;font-weight:600;display:flex;gap:.35em;flex-wrap:wrap;justify-content:center}
-.opt .o-py.hide{display:none}
-.opt .o-ru{font-size:16px;font-weight:560;text-align:center;line-height:1.3}
-.opt.correct{border-color:var(--t2);background:color-mix(in srgb,var(--t2) 14%,var(--surface))}
-.opt.wrong{border-color:var(--t1);background:color-mix(in srgb,var(--t1) 12%,var(--surface))}
-
-.slots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:62px;margin-bottom:22px}
-.slot{min-width:52px;height:56px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;
-  font-family:var(--han);font-size:28px;font-weight:500}
-span.slot{border:2px dashed var(--hairline)}
-.slot.filled{background:var(--surface);border:1.5px solid var(--text);box-shadow:var(--shadow);transition:transform .1s}
-.slot.filled:active{transform:scale(.94)}
-.slot.ok{border-color:var(--t2);color:var(--t2)}
-.slot.bad{border-color:var(--t1);color:var(--t1)}
-.bank{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
-.tile{min-width:54px;height:58px;border-radius:14px;background:var(--surface);border:1.5px solid var(--hairline);
-  font-family:var(--han);font-size:29px;font-weight:500;box-shadow:var(--shadow);transition:transform .1s,opacity .15s}
-.tile:active{transform:scale(.94)}
-.tile.used{opacity:.22;box-shadow:none}
-.shake{animation:shake .34s}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
-
-/* mode chips in deck sheet */
-.modechips{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 16px}
-.mchip{font-size:13px;font-weight:600;padding:8px 13px;border-radius:999px;
-  background:var(--surface-3);color:var(--muted);transition:background .15s,color .15s}
-.mchip.on{background:var(--cta);color:var(--cta-text)}
 
 /* ============ SUMMARY / SHEET ============ */
 .center-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;padding:30px 10px}
@@ -346,51 +286,28 @@ function renderPinyin(parts){
 }
 
 /* ---------- Parser ---------- */
-const PYISH=/[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüv]/i;
-const cleanTr=s=>s.replace(/^[\s—–\-:=|•*]+/,'').replace(/[\s—–\-:=|]+$/,'').trim();
-function looksPinyin(line){
-  const t=line.trim();
-  if(CYR.test(t)||!PYISH.test(t)) return false;
-  return t.split(/\s+/).length<=8 && /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüv'·\s\d]+$/i.test(t);
-}
-function makeCard(hanzi, provided, tr){
-  const parts=pinyinParts(hanzi, provided);
-  return {hanzi, parts, pinyin:pinyinString(parts), translation:tr, provided:!!provided};
-}
-// Перевод может стоять на той же строке ИЛИ на следующих строках (до пустой строки / нового слова)
 function parseList(text){
   const out=[];
-  let pending=null;                         // слово, ждущее перевод со следующих строк
-  const flush=()=>{ if(pending){ out.push(makeCard(pending.hanzi, pending.provided, pending.tr.join(', ').trim())); pending=null; } };
   for(const raw of (text||'').split('\n')){
     let line=raw.trim();
-    if(line===''){ flush(); continue; }                          // пустая строка = граница
-    line=line.replace(/^\s*(?:\d+[.)]|[•*▪‣]|[-–—])\s+/,'');      // ведущие маркеры
+    if(!line) continue;
+    line=line.replace(/^\s*(?:\d+[.)]|[•*▪‣]|[-–—])\s+/,''); // leading markers
     const hm=line.match(HAN_RUN);
-    if(hm){
-      flush();                                                   // новое слово закрывает предыдущее
-      const hanzi=hm[0].replace(/·/g,'');
-      let rest=line.slice(hm.index+hm[0].length).replace(/^[\s—–\-:=|\t)(\]\[]+/,'').trim();
-      let provided=null, tr='';
-      const ci=rest.search(CYR);
-      if(ci===-1){
-        if(rest && looksPinyin(rest)) provided=rest.replace(/\s+/g,' ');   // только пиньинь на строке
-        else tr=cleanTr(rest);
-      } else {
-        const head=rest.slice(0,ci).replace(/[()\[\]—–\-:=|]/g,' ').trim();
-        tr=cleanTr(rest.slice(ci));
-        if(PYISH.test(head)&&!CYR.test(head)) provided=head.replace(/\s+/g,' ');
-      }
-      if(tr){ out.push(makeCard(hanzi, provided, tr)); pending=null; } // перевод на той же строке
-      else pending={hanzi, provided, tr:[]};                          // ждём следующих строк
-    } else if(pending){                                             // строка без иероглифов
-      if(looksPinyin(line) && !pending.provided && pending.tr.length===0)
-        pending.provided=line.replace(/[()\[\]]/g,'').replace(/\s+/g,' ').trim();  // пиньинь снизу
-      else if(CYR.test(line)||PYISH.test(line))
-        pending.tr.push(cleanTr(line));                              // перевод снизу (возможно в неск. строк)
-    }                                                               // иначе строка-сирота (заголовок) — пропускаем
+    if(!hm) continue;                       // no hanzi → skip (e.g. headers)
+    const hanzi=hm[0].replace(/·/g,'');
+    let rest=line.slice(hm.index+hm[0].length).replace(/^[\s—–\-:=|\t)(\]\[]+/,'').trim();
+    let provided=null, tr='';
+    const ci=rest.search(CYR);
+    if(ci===-1){ tr=rest.replace(/[—–:=|]+/g,' ').trim(); }
+    else{
+      let head=rest.slice(0,ci).replace(/[()\[\]—–\-:=|]/g,' ').trim();
+      tr=rest.slice(ci).trim();
+      if(/[a-zA-Züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(head)) provided=head.replace(/\s+/g,' ');
+    }
+    tr=tr.replace(/^[\s—–\-:=|]+/,'').replace(/[—–\-:=|\s]+$/,'').trim();
+    const parts=pinyinParts(hanzi, provided);
+    out.push({hanzi, parts, pinyin:pinyinString(parts), translation:tr, provided:!!provided});
   }
-  flush();
   return out;
 }
 
@@ -408,8 +325,6 @@ function deckStats(d){
   const due=d.cards.filter(c=>(c.due||0)<=nowMs()).length;
   return {total,learned,due, mastered: d.cards.filter(c=>(c.box||1)>=5).length};
 }
-// «ранее изученное» слово = его уже хоть раз вспоминали правильно
-function isStudied(c){ return (c.box||1)>1 || (c.learned||0)>0; }
 
 /* ---------- tiny DOM helpers ---------- */
 const $=id=>document.getElementById(id);
@@ -435,7 +350,7 @@ function render(){
   setBack(nav.length>1);
   if(cur.name==='home') return Home();
   if(cur.name==='import') return Import();
-  if(cur.name==='study') return Study(cur.deckId, cur.scope, cur.exmode);
+  if(cur.name==='study') return Study(cur.deckId, cur.mode);
   if(cur.name==='summary') return Summary(cur.data);
   if(cur.name==='words') return Words(cur.deckId);
   Home();
@@ -454,15 +369,6 @@ function Home(){
       </div>
       <div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
   } else {
-    const studied=allCards().filter(isStudied);
-    const dueAll=studied.filter(c=>(c.due||0)<=nowMs()).length;
-    const banner = studied.length ? `<button class="review-all" id="reviewAll">
-        <div class="ra-l">
-          <div class="ra-t">Повторить всё</div>
-          <div class="ra-s">${studied.length} ${plural(studied.length,'изученное слово','изученных слова','изученных слов')} из всех списков</div>
-        </div>
-        <span class="chip ${dueAll?'due':'done'}">${dueAll?dueAll+' к повтору':'✓ всё в срок'}</span>
-      </button>` : '';
     const cards=STATE.decks.map(d=>{
       const s=deckStats(d);
       const pct=s.total?Math.round(s.learned/s.total*100):0;
@@ -480,9 +386,8 @@ function Home(){
         <div class="bar"><i style="width:${pct}%"></i></div>
       </button>`;
     }).join('');
-    root.innerHTML = banner + cards + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
+    root.innerHTML = cards + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
     root.querySelectorAll('.deck').forEach(el=>el.onclick=()=>openDeckSheet(el.dataset.deck));
-    const ra=$('reviewAll'); if(ra) ra.onclick=openReviewSheet;
   }
   $('newBtn').onclick=()=>go({name:'import'});
 }
@@ -537,27 +442,20 @@ function Import(){
 function openDeckSheet(deckId){
   const d=STATE.decks.find(x=>x.id===deckId); if(!d) return;
   const s=deckStats(d); haptic('light');
-  const modes=[['mixed','Смешанно'],['choice','Выбор из 4'],['build','Сборка'],['flip','Карточки']];
   const sh=$('sheet');
   sh.innerHTML=`
     <div class="grab"></div>
     <h3>${esc(d.name)}</h3>
     <p class="sub">${s.total} ${plural(s.total,'слово','слова','слов')} · ${s.learned} изучается · ${s.mastered} выучено</p>
-    <div class="modechips" id="modechips">${modes.map(([v,l])=>
-      `<button class="mchip${v===studyMode?' on':''}" data-m="${v}">${l}</button>`).join('')}</div>
     <button class="sheet-act" data-a="study"><span class="ic">▶</span>
       <span>${s.due>0?`Повторить (${s.due})`:'Учить сейчас'}</span></button>
     <button class="sheet-act" data-a="all"><span class="ic">⟳</span><span>Пройти все слова</span></button>
     <button class="sheet-act" data-a="words"><span class="ic">≡</span><span>Список слов</span></button>
     <button class="sheet-act danger" data-a="del"><span class="ic">✕</span><span>Удалить колоду</span></button>`;
-  sh.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{
-    studyMode=b.dataset.m; haptic('sel');
-    sh.querySelectorAll('.mchip').forEach(x=>x.classList.toggle('on',x.dataset.m===studyMode));
-  });
   sh.querySelectorAll('.sheet-act').forEach(b=>b.onclick=()=>{
     const a=b.dataset.a; closeSheet();
-    if(a==='study') go({name:'study',deckId,scope:'due',exmode:studyMode});
-    else if(a==='all') go({name:'study',deckId,scope:'all',exmode:studyMode});
+    if(a==='study') go({name:'study',deckId,mode:'due'});
+    else if(a==='all') go({name:'study',deckId,mode:'all'});
     else if(a==='words') go({name:'words',deckId});
     else if(a==='del'){
       if(confirm(`Удалить «${d.name}»? Это действие нельзя отменить.`)){
@@ -571,247 +469,80 @@ function openSheet(){ $('sheetBack').classList.add('on'); $('sheet').classList.a
 function closeSheet(){ $('sheetBack').classList.remove('on'); $('sheet').classList.remove('on'); }
 $('sheetBack').onclick=closeSheet;
 
-/* повторение всех изученных слов из всех списков */
-function openReviewSheet(){
-  const studied=allCards().filter(isStudied);
-  if(!studied.length) return;
-  haptic('light');
-  const due=studied.filter(c=>(c.due||0)<=nowMs()).length;
-  const modes=[['mixed','Смешанно'],['choice','Выбор из 4'],['build','Сборка'],['flip','Карточки']];
-  const sh=$('sheet');
-  sh.innerHTML=`
-    <div class="grab"></div>
-    <h3>Повторить всё</h3>
-    <p class="sub">${studied.length} ${plural(studied.length,'изученное слово','изученных слова','изученных слов')} · ${due} к повтору</p>
-    <div class="modechips">${modes.map(([v,l])=>`<button class="mchip${v===studyMode?' on':''}" data-m="${v}">${l}</button>`).join('')}</div>
-    <button class="sheet-act" data-a="due"><span class="ic">▶</span>
-      <span>${due>0?`Повторить к сроку (${due})`:'Повторить всё'}</span></button>
-    <button class="sheet-act" data-a="all"><span class="ic">⟳</span><span>Пройти все изученные</span></button>`;
-  sh.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{
-    studyMode=b.dataset.m; haptic('sel');
-    sh.querySelectorAll('.mchip').forEach(x=>x.classList.toggle('on',x.dataset.m===studyMode));
-  });
-  sh.querySelectorAll('.sheet-act').forEach(b=>b.onclick=()=>{
-    const a=b.dataset.a; closeSheet();
-    go({name:'study',deckId:'__all__',scope:a==='all'?'all':'due',exmode:studyMode});
-  });
-  openSheet();
-}
-
-/* ---------- STUDY (карточки · выбор из 4 · сборка слова) ---------- */
+/* ---------- STUDY ---------- */
 let session=null;
-let studyMode='mixed';
-const cardParts=c=>(c.parts&&c.parts.length)?c.parts:pinyinParts(c.hanzi,c.pinyin);
-const chars=s=>Array.from(s);              // unicode-safe split
-function allCards(){ const a=[]; for(const d of STATE.decks) for(const c of d.cards) a.push(c); return a; }
-
-function Study(deckId, scope, exmode){
-  let d;
-  if(deckId==='__all__'){
-    const cards=allCards().filter(isStudied);
-    if(!cards.length){ nav=[{name:'home'}]; return render(); }
-    d={ id:'__all__', name:'Повторение всех слов', cards };
-  } else {
-    d=STATE.decks.find(x=>x.id===deckId);
-    if(!d){ nav=[{name:'home'}]; return render(); }
-  }
+function Study(deckId, mode){
+  const d=STATE.decks.find(x=>x.id===deckId);
+  if(!d){ nav=[{name:'home'}]; return render(); }
   topC.innerHTML=`<div class="screen-title">${esc(d.name)}</div>`;
-  let pool = scope==='all' ? d.cards.slice() : d.cards.filter(c=>(c.due||0)<=nowMs());
+
+  let pool = mode==='all' ? d.cards.slice() : d.cards.filter(c=>(c.due||0)<=nowMs());
   if(!pool.length) pool=d.cards.slice();
   shuffle(pool);
-  session={ deck:d, queue:pool.map(c=>c.id), total:pool.length, mode:exmode||'mixed',
-            learnedIds:new Set(), repeatedIds:new Set(), locked:false };
-  nextExercise();
+  session={ deck:d, queue:pool.map(c=>c.id), total:pool.length,
+            learnedIds:new Set(), repeatedIds:new Set(), flipped:false };
+  drawCard();
 }
-
-// choose exercise type for a card
-function exerciseFor(card){
-  const multi = chars(card.hanzi).length>=2;
-  if(session.mode==='flip') return 'flip';
-  if(session.mode==='choice') return 'choice';
-  if(session.mode==='build') return multi ? 'build' : 'choice';
-  // mixed
-  const r=Math.random();
-  if(multi){ if(r<0.40) return 'choice'; if(r<0.70) return 'build'; return 'flip'; }
-  return r<0.6 ? 'choice' : 'flip';
-}
-
-function studyShell(inner){
+function drawCard(){
   const s=session;
+  if(!s.queue.length){ return finishSession(); }
+  const card=s.deck.cards.find(c=>c.id===s.queue[0]);
   const doneCount = s.total - new Set(s.queue).size;
   const pct=Math.round(doneCount/s.total*100);
+  const parts = card.parts && card.parts.length ? card.parts : pinyinParts(card.hanzi, card.pinyin);
+  s.flipped=false;
   root.innerHTML=`
     <div class="study">
       <div class="studybar">
         <span class="ct">${Math.min(doneCount+1,s.total)} / ${s.total}</span>
         <div class="pbar"><i style="width:${pct}%"></i></div>
       </div>
-      ${inner}
+      <div class="stage">
+        <div class="card swap" id="card">
+          <div class="face front">
+            <div class="hanzi">${esc(card.hanzi)}</div>
+            <div class="pinyin">${renderPinyin(parts)}</div>
+            <div class="flip-hint">нажмите, чтобы увидеть перевод</div>
+          </div>
+          <div class="face back">
+            <div class="hz-mini">${esc(card.hanzi)}</div>
+            <div class="ru">${esc(card.translation)||'—'}</div>
+            <div class="py-mini">${renderPinyin(parts)}</div>
+          </div>
+        </div>
+      </div>
+      <div id="ctrl"></div>
       <div class="legend">
-        <span><i style="background:var(--t1)"></i>1</span>
-        <span><i style="background:var(--t2)"></i>2</span>
-        <span><i style="background:var(--t3)"></i>3</span>
-        <span><i style="background:var(--t4)"></i>4</span>
-        <span><i style="background:var(--t5)"></i>·</span>
+        <span><i style="background:var(--t1)"></i>1-й тон</span>
+        <span><i style="background:var(--t2)"></i>2-й</span>
+        <span><i style="background:var(--t3)"></i>3-й</span>
+        <span><i style="background:var(--t4)"></i>4-й</span>
+        <span><i style="background:var(--t5)"></i>лёгкий</span>
       </div>
     </div>`;
-}
-
-function nextExercise(){
-  const s=session;
-  if(!s.queue.length) return finishSession();
-  s.locked=false;
-  const card=s.deck.cards.find(c=>c.id===s.queue[0]);
-  const ex=exerciseFor(card);
-  if(ex==='flip') return exFlip(card);
-  if(ex==='choice') return exChoice(card);
-  if(ex==='build') return exBuild(card);
-  exFlip(card);
-}
-
-// resolve current card: ok -> advance & schedule; wrong -> reset box & requeue
-function resolve(ok){
-  const s=session; if(s.resolving) return;
-  const id=s.queue[0];
-  const card=s.deck.cards.find(c=>c.id===id);
-  if(!card){ return; }
-  s.resolving=true; s.locked=true;
-  schedule(card, ok);
-  s.queue.shift();
-  if(ok){ s.learnedIds.add(id); }
-  else { s.repeatedIds.add(id); const pos=Math.min(3,s.queue.length); s.queue.splice(pos,0,id); }
-  persist();
-  setTimeout(()=>{ s.resolving=false; nextExercise(); }, ok?260:520);
-}
-
-/* --- 1) FLIP card (recall) --- */
-function exFlip(card){
-  const parts=cardParts(card);
-  studyShell(`
-    <div class="stage">
-      <div class="card swap" id="card">
-        <div class="face front">
-          <div class="hanzi">${esc(card.hanzi)}</div>
-          <div class="pinyin">${renderPinyin(parts)}</div>
-          <div class="flip-hint">нажмите, чтобы увидеть перевод</div>
-        </div>
-        <div class="face back">
-          <div class="hz-mini">${esc(card.hanzi)}</div>
-          <div class="ru">${esc(card.translation)||'—'}</div>
-          <div class="py-mini">${renderPinyin(parts)}</div>
-        </div>
-      </div>
-    </div>
-    <div id="ctrl"><div class="tapcatch">нажмите на карточку</div></div>`);
-  const cardEl=$('card'), ctrl=$('ctrl'); let flipped=false;
-  cardEl.onclick=()=>{
-    if(flipped) return; flipped=true; cardEl.classList.add('flipped'); haptic('light');
+  const cardEl=$('card'), ctrl=$('ctrl');
+  ctrl.innerHTML=`<div class="tapcatch">нажмите на карточку</div>`;
+  const flip=()=>{
+    if(s.flipped) return;
+    s.flipped=true; cardEl.classList.add('flipped'); haptic('light');
     ctrl.innerHTML=`<div class="answers">
       <button class="ans no" id="noBtn">Не знаю</button>
       <button class="ans yes" id="yesBtn">Знаю</button></div>`;
-    $('noBtn').onclick=()=>{ haptic('medium'); resolve(false); };
-    $('yesBtn').onclick=()=>{ notify('success'); resolve(true); };
+    $('noBtn').onclick=()=>answer(false);
+    $('yesBtn').onclick=()=>answer(true);
   };
+  cardEl.onclick=flip;
 }
-
-/* --- 2) CHOICE: 4 options, direction random --- */
-function distractors(card, key, n){
-  let pool=session.deck.cards.filter(c=>c.id!==card.id);
-  if(pool.length<n) pool=pool.concat(allCards().filter(c=>c.id!==card.id));
-  const seen=new Set([card[key]]); const out=[];
-  shuffle(pool);
-  for(const c of pool){ if(seen.has(c[key])) continue; seen.add(c[key]); out.push(c); if(out.length>=n) break; }
-  return out;
+function answer(ok){
+  const s=session, id=s.queue[0];
+  const card=s.deck.cards.find(c=>c.id===id);
+  schedule(card, ok);
+  if(ok){ s.learnedIds.add(id); s.queue.shift(); notify('success'); }
+  else { s.repeatedIds.add(id); s.queue.shift();
+         const pos=Math.min(3,s.queue.length); s.queue.splice(pos,0,id); haptic('medium'); }
+  persist();
+  drawCard();
 }
-function exChoice(card){
-  const s=session;
-  const ru2cn = Math.random()<0.5;                 // direction
-  const key = ru2cn ? 'hanzi' : 'translation';
-  const opts = shuffle([card, ...distractors(card, key, 3)]);
-  const prompt = ru2cn
-    ? `<div class="q-prompt"><div class="ru-big">${esc(card.translation)||'—'}</div></div>
-       <div class="q-label">Выберите слово</div>`
-    : `<div class="q-prompt"><div class="hz-big">${esc(card.hanzi)}</div>
-         <div class="py-big">${renderPinyin(cardParts(card))}</div></div>
-       <div class="q-label">Выберите перевод</div>`;
-  const optHtml = opts.map(o=>{
-    const inner = ru2cn
-      ? `<span class="o-hz">${esc(o.hanzi)}</span><span class="o-py hide">${renderPinyin(cardParts(o))}</span>`
-      : `<span class="o-ru">${esc(o.translation)||'—'}</span>`;
-    return `<button class="opt" data-id="${o.id}">${inner}</button>`;
-  }).join('');
-  studyShell(`${prompt}<div class="options ${ru2cn?'cols2':'col1'}">${optHtml}</div>`);
-  root.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
-    if(s.locked) return; s.locked=true;
-    const ok = b.dataset.id===card.id;
-    const correctBtn = root.querySelector(`.opt[data-id="${card.id}"]`);
-    root.querySelectorAll('.opt').forEach(x=>x.disabled=true);
-    if(ok){ b.classList.add('correct'); notify('success'); }
-    else { b.classList.add('wrong'); if(correctBtn) correctBtn.classList.add('correct'); haptic('medium'); }
-    // в направлении рус→кит пиньинь скрыт как подсказка — показываем после ответа
-    if(ru2cn) root.querySelectorAll('.opt.correct .o-py,.opt.wrong .o-py').forEach(p=>p.classList.remove('hide'));
-    resolve(ok);
-  });
-}
-
-/* --- 3) BUILD: assemble hanzi in order --- */
-function exBuild(card){
-  const s=session;
-  const target=chars(card.hanzi);
-  // distractor characters from other words
-  const others=allCards().filter(c=>c.id!==card.id).flatMap(c=>chars(c.hanzi));
-  const extra=[]; shuffle(others);
-  for(const ch of others){ if(target.indexOf(ch)===-1 && extra.indexOf(ch)===-1){ extra.push(ch); if(extra.length>=Math.min(2,Math.max(1,target.length-1))) break; } }
-  const bank = shuffle(target.concat(extra).map((ch,i)=>({ch, key:'t'+i})));
-  const picked=[];                                  // array of bank items
-  studyShell(`
-    <div class="q-prompt build">
-      <div class="ru-big">${esc(card.translation)||'—'}</div>
-    </div>
-    <div class="q-label">Соберите слово</div>
-    <div class="slots" id="slots"></div>
-    <div class="bank" id="bank"></div>`);
-  const slotsEl=$('slots'), bankEl=$('bank');
-  function paint(){
-    slotsEl.innerHTML = target.map((_,i)=>{
-      const it=picked[i];
-      return it ? `<button class="slot filled" data-pi="${i}">${esc(it.ch)}</button>`
-                : `<span class="slot"></span>`;
-    }).join('');
-    bankEl.innerHTML = bank.map(it=>{
-      const used = picked.indexOf(it)>-1;
-      return `<button class="tile${used?' used':''}" data-key="${it.key}"${used?' disabled':''}>${esc(it.ch)}</button>`;
-    }).join('');
-    slotsEl.querySelectorAll('.slot.filled').forEach(b=>b.onclick=()=>{
-      if(s.locked) return; const i=+b.dataset.pi; picked.splice(i,1); haptic('sel'); paint();
-    });
-    bankEl.querySelectorAll('.tile:not(.used)').forEach(b=>b.onclick=()=>{
-      if(s.locked) return;
-      const it=bank.find(x=>x.key===b.dataset.key);
-      if(picked.length>=target.length) return;
-      picked.push(it); haptic('sel'); paint();
-      if(picked.length===target.length) check();
-    });
-  }
-  function check(){
-    s.locked=true;
-    const ok = picked.map(p=>p.ch).join('')===card.hanzi;
-    slotsEl.querySelectorAll('.slot.filled').forEach(b=>b.classList.add(ok?'ok':'bad'));
-    const pr=root.querySelector('.q-prompt.build');                 // показываем пиньинь уже после ответа
-    if(pr && !pr.querySelector('.py-hint')) pr.insertAdjacentHTML('beforeend', `<div class="py-hint">${renderPinyin(cardParts(card))}</div>`);
-    if(ok){ notify('success'); resolve(true); }
-    else {
-      haptic('medium'); slotsEl.classList.add('shake');
-      // reveal correct order
-      setTimeout(()=>{
-        slotsEl.innerHTML = target.map(ch=>`<button class="slot filled ok">${esc(ch)}</button>`).join('');
-      }, 360);
-      resolve(false);
-    }
-  }
-  paint();
-}
-
 function finishSession(){
   const s=session;
   go({name:'summary', data:{ deckId:s.deck.id, learned:s.learnedIds.size, repeated:s.repeatedIds.size, total:s.total }});
@@ -835,7 +566,7 @@ function Summary(data){
         <button class="cta ghost" id="homeBtn">На главную</button>
       </div>
     </div>`;
-  $('againBtn').onclick=()=>{ nav=[{name:'home'}]; go({name:'study',deckId:data.deckId,scope:'all',exmode:studyMode}); };
+  $('againBtn').onclick=()=>{ nav=[{name:'home'}]; go({name:'study',deckId:data.deckId,mode:'all'}); };
   $('homeBtn').onclick=()=>{ nav=[{name:'home'}]; render(); };
 }
 
@@ -857,7 +588,7 @@ function Words(deckId){
       <div class="box">${lbl}</div>
     </div>`;}).join('')}</div>
     <div class="fabwrap"><button class="cta" id="studyAll">Учить эти слова</button></div>`;
-  $('studyAll').onclick=()=>{ nav=nav.filter(n=>n.name!=='words'); go({name:'study',deckId,scope:'all',exmode:studyMode}); };
+  $('studyAll').onclick=()=>{ nav=nav.filter(n=>n.name!=='words'); go({name:'study',deckId,mode:'all'}); };
 }
 
 /* ---------- utils ---------- */
