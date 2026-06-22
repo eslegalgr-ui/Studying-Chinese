@@ -47,6 +47,7 @@ input,textarea{font-family:inherit;color:inherit}
 
 /* ============ HEADER ============ */
 .top{display:flex;align-items:center;gap:12px;margin-bottom:18px;min-height:38px}
+#topContent{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
 .top .back{font-size:22px;width:38px;height:38px;border-radius:12px;display:none;
   align-items:center;justify-content:center;margin-left:-8px;color:var(--text);
   transition:background .15s}
@@ -55,10 +56,53 @@ input,textarea{font-family:inherit;color:inherit}
 .brand .mark{font-family:var(--han);font-size:21px;font-weight:600;letter-spacing:.04em}
 .brand .name{font-size:16px;letter-spacing:.01em}
 .top .sub{color:var(--muted);font-size:13px;margin-left:auto;font-weight:500}
+.gear{margin-left:auto;width:38px;height:38px;border-radius:12px;font-size:19px;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s}
+.gear:active{background:var(--surface-3);transform:rotate(40deg)}
 .screen-title{font-size:18px;font-weight:680;letter-spacing:-.01em}
+
+/* ---- settings ---- */
+.set-group{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:22px 4px 9px}
+.set-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);padding:4px 16px;box-shadow:var(--shadow)}
+.set-acc{display:flex;align-items:center;gap:13px;padding:14px 0 12px}
+.set-ava{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--t3),var(--t4));
+  color:#fff;font-weight:700;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.set-name{font-weight:680;font-size:16px}
+.set-id{color:var(--muted);font-size:13px;margin-top:1px}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;font-size:15.5px}
+.set-row b{color:var(--muted);font-weight:600;font-size:14px}
+.set-row.sep,.set-toggle.sep,.set-line.sep{border-top:1px solid var(--hairline)}
+.set-note{color:var(--muted);font-size:12.5px;line-height:1.55;margin:0;padding:0 0 14px}
+.set-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;font-size:15.5px;cursor:pointer}
+.set-toggle input{position:absolute;opacity:0;pointer-events:none}
+.set-toggle .sw{width:46px;height:28px;border-radius:999px;background:var(--surface-3);position:relative;transition:background .2s;flex-shrink:0}
+.set-toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.set-toggle input:checked + .sw{background:var(--t2)}
+.set-toggle input:checked + .sw::after{transform:translateX(18px)}
+.set-row input[type=time]{background:var(--surface-3);border:none;border-radius:10px;padding:8px 12px;font-size:15px;color:var(--text)}
+.set-row input[type=time]:disabled{opacity:.4}
+.stepper{display:flex;align-items:center;gap:14px}
+.stepper button{width:32px;height:32px;border-radius:10px;background:var(--surface-3);font-size:20px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.stepper button:active{opacity:.6}
+.stepper b{min-width:26px;text-align:center;font-variant-numeric:tabular-nums;font-size:16px}
+.set-line{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:15px 0;font-size:15.5px;font-weight:540}
+.set-line .ic{width:20px;text-align:center;font-size:17px;color:var(--muted)}
+.set-line:active{opacity:.55}
+.set-foot{text-align:center;color:var(--faint);font-size:12px;margin:26px 0 8px}
 
 /* ============ HOME ============ */
 .lead{color:var(--muted);font-size:14.5px;margin:-6px 0 20px}
+.review-all{display:flex;align-items:center;gap:12px;width:100%;text-align:left;position:relative;overflow:hidden;
+  background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:16px 18px 16px 22px;margin-bottom:18px;box-shadow:var(--shadow);transition:transform .12s}
+.review-all:active{transform:scale(.985)}
+.review-all::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--t1),var(--t3),var(--t4))}
+.review-all .ra-t{font-weight:680;font-size:16.5px;letter-spacing:-.01em}
+.review-all .ra-s{color:var(--muted);font-size:13px;margin-top:3px}
+.review-all .chip{margin-left:auto;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;
+  background:var(--surface-3);color:var(--muted);white-space:nowrap}
+.review-all .chip.due{background:color-mix(in srgb,var(--t1) 16%,transparent);color:var(--t1)}
+.review-all .chip.done{background:color-mix(in srgb,var(--t2) 16%,transparent);color:var(--t2)}
 .deck{display:block;width:100%;text-align:left;background:var(--surface);
   border:1px solid var(--hairline);border-radius:var(--radius);padding:16px 18px;
   margin-bottom:12px;box-shadow:var(--shadow);transition:transform .12s ease, box-shadow .12s}
@@ -152,11 +196,61 @@ input,textarea{font-family:inherit;color:inherit}
 .legend span{font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;font-weight:600}
 .legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
 
+/* ---- exercise: choice & build ---- */
+.q-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;background:var(--surface);border:1px solid var(--hairline);border-radius:24px;
+  box-shadow:var(--shadow);padding:30px 22px;margin:8px 0 6px;min-height:150px}
+.q-prompt.build{min-height:120px;padding:24px 22px}
+.q-prompt .hz-big{font-family:var(--han);font-weight:500;font-size:clamp(46px,13vw,72px);line-height:1.05}
+.q-prompt .py-big{font-size:clamp(17px,4.6vw,22px);font-weight:600;margin-top:14px;display:flex;gap:.4em;flex-wrap:wrap;justify-content:center}
+.q-prompt .ru-big{font-size:clamp(22px,6.4vw,30px);font-weight:660;line-height:1.25;letter-spacing:-.01em}
+.q-prompt .py-hint{font-size:15px;font-weight:600;margin-top:12px;opacity:.85;display:flex;gap:.4em;flex-wrap:wrap;justify-content:center}
+.q-label{text-align:center;color:var(--muted);font-size:12.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.07em;margin:14px 0 12px}
+
+.options{display:grid;gap:10px}
+.options.cols2{grid-template-columns:1fr 1fr}
+.options.col1{grid-template-columns:1fr}
+.opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:var(--surface);border:1.5px solid var(--hairline);border-radius:16px;
+  padding:16px 14px;min-height:62px;transition:transform .1s,border-color .15s,background .15s}
+.opt:active{transform:scale(.97)}
+.opt[disabled]{pointer-events:none}
+.opt .o-hz{font-family:var(--han);font-size:24px;font-weight:500;line-height:1.1}
+.opt .o-py{font-size:13px;font-weight:600;display:flex;gap:.35em;flex-wrap:wrap;justify-content:center}
+.opt .o-py.hide{display:none}
+.opt .o-ru{font-size:16px;font-weight:560;text-align:center;line-height:1.3}
+.opt.correct{border-color:var(--t2);background:color-mix(in srgb,var(--t2) 14%,var(--surface))}
+.opt.wrong{border-color:var(--t1);background:color-mix(in srgb,var(--t1) 12%,var(--surface))}
+
+.slots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:62px;margin-bottom:22px}
+.slot{min-width:52px;height:56px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--han);font-size:28px;font-weight:500}
+span.slot{border:2px dashed var(--hairline)}
+.slot.filled{background:var(--surface);border:1.5px solid var(--text);box-shadow:var(--shadow);transition:transform .1s}
+.slot.filled:active{transform:scale(.94)}
+.slot.ok{border-color:var(--t2);color:var(--t2)}
+.slot.bad{border-color:var(--t1);color:var(--t1)}
+.bank{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.tile{min-width:54px;height:58px;border-radius:14px;background:var(--surface);border:1.5px solid var(--hairline);
+  font-family:var(--han);font-size:29px;font-weight:500;box-shadow:var(--shadow);transition:transform .1s,opacity .15s}
+.tile:active{transform:scale(.94)}
+.tile.used{opacity:.22;box-shadow:none}
+.shake{animation:shake .34s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+
+/* mode chips in deck sheet */
+.modechips{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 16px}
+.mchip{font-size:13px;font-weight:600;padding:8px 13px;border-radius:999px;
+  background:var(--surface-3);color:var(--muted);transition:background .15s,color .15s}
+.mchip.on{background:var(--cta);color:var(--cta-text)}
+
 /* ============ SUMMARY / SHEET ============ */
 .center-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;padding:30px 10px}
 .center-wrap .big{font-family:var(--han);font-size:64px;margin-bottom:8px;
   background:linear-gradient(135deg,var(--t2),var(--t3));-webkit-background-clip:text;background-clip:text;color:transparent}
 .center-wrap h2{font-size:23px;margin:0;font-weight:700}
+.center-wrap .cw-sub{color:var(--muted);font-size:14.5px;margin:8px 0 0;max-width:300px;line-height:1.5}
 .center-wrap .stats{display:flex;gap:26px;margin:22px 0 30px}
 .center-wrap .stat b{display:block;font-size:30px;font-weight:740;line-height:1;font-variant-numeric:tabular-nums}
 .center-wrap .stat span{font-size:12.5px;color:var(--muted);margin-top:6px;display:block}
@@ -177,6 +271,16 @@ input,textarea{font-family:inherit;color:inherit}
 .sheet-act .ic{width:22px;text-align:center;font-size:17px}
 .sheet-act.danger{color:var(--t1)}
 .sheet-act:active{opacity:.55}
+.sheet-act.primary{border-top:none;color:var(--cta);font-weight:680}
+.sheet-act.primary .ic{color:var(--cta)}
+.sheet-act.muted{color:var(--muted);border-top:none}
+.sheet-act.muted:active{opacity:1}
+.sheet-act b{font-weight:740}
+.chips-label{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:14px 2px 8px;border-top:1px solid var(--hairline);padding-top:14px}
+.chip.new{background:color-mix(in srgb,var(--t3) 16%,transparent);color:var(--t3)}
+.deck .chip.new{margin-left:auto}
+.phase{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  background:var(--surface-3);padding:3px 8px;border-radius:999px;white-space:nowrap}
 
 /* word list */
 .wlist{display:flex;flex-direction:column;gap:1px;background:var(--hairline);
@@ -241,23 +345,89 @@ function applyTgTheme(){
 if(TG){ try{ TG.ready(); TG.expand(); applyTgTheme(); TG.onEvent('themeChanged',applyTgTheme);
   if(TG.setHeaderColor) try{TG.setHeaderColor('bg_color')}catch(e){} }catch(e){} }
 
-/* ---------- Storage (localStorage → memory fallback) ---------- */
-const KEY='hanzi_cards_v1';
+/* ---------- Storage: Telegram CloudStorage (синхронизация между устройствами) → localStorage → память ----------
+   Внутри Telegram данные привязаны к аккаунту пользователя автоматически (отдельный «кабинет»
+   у каждого) и доступны на всех его устройствах. Без Telegram — только локально в браузере. */
+const KEY='hanzi_cards_v2';
+const SETTINGS_DEFAULT={ reminders:false, reminderTime:'19:00', learnBatch:10, pinyinFront:true, lastReminded:null };
 let _mem=null;
-const Store={
-  load(){
-    try{ const raw=localStorage.getItem(KEY); if(raw) return JSON.parse(raw); }catch(e){}
-    if(_mem) return _mem;
-    return {decks:[]};
-  },
-  save(s){
-    _mem=s;
-    try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){}
-  }
-};
-let STATE = Store.load();
-function persist(){ Store.save(STATE); }
 const uid=()=>Math.random().toString(36).slice(2,10);
+
+function blankState(){ return { v:2, decks:[], settings:Object.assign({},SETTINGS_DEFAULT), updatedAt:0 }; }
+function normalize(s){
+  s=s||blankState();
+  if(!Array.isArray(s.decks)) s.decks=[];
+  s.settings=Object.assign({},SETTINGS_DEFAULT,s.settings||{});
+  for(const d of s.decks){ if(!Array.isArray(d.cards)) d.cards=[];
+    for(const c of d.cards){ c.box=c.box||1; c.due=c.due||0; c.learned=c.learned||0;
+      c.introduced=!!c.introduced; c.provided=!!c.provided; } }
+  return s;
+}
+// компактная сериализация (parts не храним — пересчитываются из иероглифов)
+function serialize(s){
+  return { v:2, updatedAt:s.updatedAt||nowMs(), settings:s.settings,
+    decks:s.decks.map(d=>({ id:d.id, name:d.name, createdAt:d.createdAt,
+      cards:d.cards.map(c=>({ id:c.id, hanzi:c.hanzi, pinyin:c.pinyin, translation:c.translation,
+        provided:c.provided?1:0, box:c.box||1, due:c.due||0, learned:c.learned||0, introduced:c.introduced?1:0 })) })) };
+}
+// --- local (sync) ---
+function loadLocal(){ try{ const r=localStorage.getItem(KEY); if(r) return JSON.parse(r); }catch(e){} return _mem; }
+function saveLocal(s){ _mem=s; try{ localStorage.setItem(KEY, JSON.stringify(serialize(s))); }catch(e){} }
+
+// --- Telegram CloudStorage (async, разбивка по кускам ≤4096) ---
+const tgCloud = (TG && TG.CloudStorage && TG.isVersionAtLeast && TG.isVersionAtLeast('6.9')) ? TG.CloudStorage : null;
+const CK_IDX='hc_idx', CK=(i)=>'hc_'+i, CHUNK=3800;
+const cloudGet=keys=>new Promise(r=>{ try{ tgCloud.getItems(keys,(e,v)=>r(e?null:v)); }catch(_){ r(null); } });
+const cloudSet=(k,v)=>new Promise(r=>{ try{ tgCloud.setItem(k,v,(e,ok)=>r(!e&&ok)); }catch(_){ r(false); } });
+const cloudKeysAll=()=>new Promise(r=>{ try{ tgCloud.getKeys((e,k)=>r(e?[]:(k||[]))); }catch(_){ r([]); } });
+const cloudDel=keys=>new Promise(r=>{ try{ tgCloud.removeItems(keys,()=>r(true)); }catch(_){ r(false); } });
+async function cloudLoad(){
+  if(!tgCloud) return null;
+  const iw=await cloudGet([CK_IDX]); const idxRaw=iw&&iw[CK_IDX];
+  if(!idxRaw) return null;
+  let idx; try{ idx=JSON.parse(idxRaw); }catch(e){ return null; }
+  const keys=[]; for(let i=0;i<idx.n;i++) keys.push(CK(i));
+  const parts=await cloudGet(keys); if(!parts) return null;
+  let str=''; for(let i=0;i<idx.n;i++) str+=(parts[CK(i)]||'');
+  try{ const o=JSON.parse(str); o.updatedAt=idx.updatedAt||o.updatedAt||0; return o; }catch(e){ return null; }
+}
+async function cloudSave(s){
+  if(!tgCloud) return false;
+  const str=JSON.stringify(serialize(s));
+  const chunks=[]; for(let i=0;i<str.length;i+=CHUNK) chunks.push(str.slice(i,i+CHUNK));
+  for(let i=0;i<chunks.length;i++){ if(!await cloudSet(CK(i),chunks[i])) return false; }
+  await cloudSet(CK_IDX, JSON.stringify({n:chunks.length, updatedAt:s.updatedAt||nowMs()}));
+  const existing=await cloudKeysAll();
+  const stale=existing.filter(k=>/^hc_\d+$/.test(k) && (+k.slice(3))>=chunks.length);
+  if(stale.length) await cloudDel(stale);
+  return true;
+}
+
+let STATE = normalize(loadLocal() || blankState());
+let _cloudTimer=null, syncState = tgCloud?'pending':'local';
+function persist(){
+  STATE.updatedAt=nowMs();
+  saveLocal(STATE);
+  if(tgCloud){ clearTimeout(_cloudTimer); _cloudTimer=setTimeout(async()=>{
+    syncState='saving'; updateSyncUI();
+    const ok=await cloudSave(STATE); syncState=ok?'synced':'error'; updateSyncUI();
+  }, 700); }
+}
+async function bootSync(){
+  if(!tgCloud){ syncState='local'; return; }
+  const cloud=await cloudLoad();
+  if(cloud){
+    if((cloud.updatedAt||0)>=(STATE.updatedAt||0) || !STATE.decks.length){
+      STATE=normalize(cloud); syncState='synced'; render(); maybeRemind();
+    } else { cloudSave(STATE); syncState='synced'; }
+  } else { if(STATE.decks.length) await cloudSave(STATE); syncState='synced'; }
+  updateSyncUI();
+}
+function updateSyncUI(){ const el=$('syncStatus'); if(el) el.textContent=syncLabel(); }
+function syncLabel(){
+  if(!tgCloud) return 'Только на этом устройстве';
+  return ({pending:'Синхронизация…',saving:'Сохранение…',synced:'Синхронизировано',error:'Ошибка синхронизации'})[syncState]||'';
+}
 
 /* ---------- Pinyin & tones ---------- */
 const HAN_RUN=/[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3007·]+/;
@@ -286,28 +456,51 @@ function renderPinyin(parts){
 }
 
 /* ---------- Parser ---------- */
+const PYISH=/[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüv]/i;
+const cleanTr=s=>s.replace(/^[\s—–\-:=|•*]+/,'').replace(/[\s—–\-:=|]+$/,'').trim();
+function looksPinyin(line){
+  const t=line.trim();
+  if(CYR.test(t)||!PYISH.test(t)) return false;
+  return t.split(/\s+/).length<=8 && /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüv'·\s\d]+$/i.test(t);
+}
+function makeCard(hanzi, provided, tr){
+  const parts=pinyinParts(hanzi, provided);
+  return {hanzi, parts, pinyin:pinyinString(parts), translation:tr, provided:!!provided};
+}
+// Перевод может стоять на той же строке ИЛИ на следующих строках (до пустой строки / нового слова)
 function parseList(text){
   const out=[];
+  let pending=null;                         // слово, ждущее перевод со следующих строк
+  const flush=()=>{ if(pending){ out.push(makeCard(pending.hanzi, pending.provided, pending.tr.join(', ').trim())); pending=null; } };
   for(const raw of (text||'').split('\n')){
     let line=raw.trim();
-    if(!line) continue;
-    line=line.replace(/^\s*(?:\d+[.)]|[•*▪‣]|[-–—])\s+/,''); // leading markers
+    if(line===''){ flush(); continue; }                          // пустая строка = граница
+    line=line.replace(/^\s*(?:\d+[.)]|[•*▪‣]|[-–—])\s+/,'');      // ведущие маркеры
     const hm=line.match(HAN_RUN);
-    if(!hm) continue;                       // no hanzi → skip (e.g. headers)
-    const hanzi=hm[0].replace(/·/g,'');
-    let rest=line.slice(hm.index+hm[0].length).replace(/^[\s—–\-:=|\t)(\]\[]+/,'').trim();
-    let provided=null, tr='';
-    const ci=rest.search(CYR);
-    if(ci===-1){ tr=rest.replace(/[—–:=|]+/g,' ').trim(); }
-    else{
-      let head=rest.slice(0,ci).replace(/[()\[\]—–\-:=|]/g,' ').trim();
-      tr=rest.slice(ci).trim();
-      if(/[a-zA-Züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(head)) provided=head.replace(/\s+/g,' ');
-    }
-    tr=tr.replace(/^[\s—–\-:=|]+/,'').replace(/[—–\-:=|\s]+$/,'').trim();
-    const parts=pinyinParts(hanzi, provided);
-    out.push({hanzi, parts, pinyin:pinyinString(parts), translation:tr, provided:!!provided});
+    if(hm){
+      flush();                                                   // новое слово закрывает предыдущее
+      const hanzi=hm[0].replace(/·/g,'');
+      let rest=line.slice(hm.index+hm[0].length).replace(/^[\s—–\-:=|\t)(\]\[]+/,'').trim();
+      let provided=null, tr='';
+      const ci=rest.search(CYR);
+      if(ci===-1){
+        if(rest && looksPinyin(rest)) provided=rest.replace(/\s+/g,' ');   // только пиньинь на строке
+        else tr=cleanTr(rest);
+      } else {
+        const head=rest.slice(0,ci).replace(/[()\[\]—–\-:=|]/g,' ').trim();
+        tr=cleanTr(rest.slice(ci));
+        if(PYISH.test(head)&&!CYR.test(head)) provided=head.replace(/\s+/g,' ');
+      }
+      if(tr){ out.push(makeCard(hanzi, provided, tr)); pending=null; } // перевод на той же строке
+      else pending={hanzi, provided, tr:[]};                          // ждём следующих строк
+    } else if(pending){                                             // строка без иероглифов
+      if(looksPinyin(line) && !pending.provided && pending.tr.length===0)
+        pending.provided=line.replace(/[()\[\]]/g,'').replace(/\s+/g,' ').trim();  // пиньинь снизу
+      else if(CYR.test(line)||PYISH.test(line))
+        pending.tr.push(cleanTr(line));                              // перевод снизу (возможно в неск. строк)
+    }                                                               // иначе строка-сирота (заголовок) — пропускаем
   }
+  flush();
   return out;
 }
 
@@ -321,10 +514,16 @@ function schedule(card, ok){
 }
 function deckStats(d){
   const total=d.cards.length;
-  const learned=d.cards.filter(c=>(c.box||1)>=3).length;
-  const due=d.cards.filter(c=>(c.due||0)<=nowMs()).length;
-  return {total,learned,due, mastered: d.cards.filter(c=>(c.box||1)>=5).length};
+  const fresh=d.cards.filter(isNew).length;                                  // ещё не начинали учить
+  const learning=d.cards.filter(c=>isStudied(c)&&(c.box||1)<5).length;
+  const due=d.cards.filter(c=>isStudied(c)&&(c.due||0)<=nowMs()).length;
+  const mastered=d.cards.filter(c=>(c.box||1)>=5).length;
+  const studied=d.cards.filter(isStudied).length;
+  return {total, fresh, learning, due, mastered, studied};
 }
+// «изученное» = слово уже проходили (через «Учить» или верно отвечали раньше)
+function isStudied(c){ return !!c.introduced || (c.box||1)>1 || (c.learned||0)>0; }
+function isNew(c){ return !isStudied(c); }
 
 /* ---------- tiny DOM helpers ---------- */
 const $=id=>document.getElementById(id);
@@ -350,16 +549,20 @@ function render(){
   setBack(nav.length>1);
   if(cur.name==='home') return Home();
   if(cur.name==='import') return Import();
-  if(cur.name==='study') return Study(cur.deckId, cur.mode);
+  if(cur.name==='study') return Study(cur.deckId, cur.scope, cur.exmode);
+  if(cur.name==='learn') return Learn(cur.deckId);
+  if(cur.name==='learnsummary') return LearnSummary(cur.data);
   if(cur.name==='summary') return Summary(cur.data);
   if(cur.name==='words') return Words(cur.deckId);
+  if(cur.name==='settings') return Settings();
   Home();
 }
 
 /* ---------- HOME ---------- */
 function Home(){
   topC.innerHTML=`<div class="brand"><span class="mark">汉字</span><span class="name">Карточки</span></div>
-    <div class="sub">${STATE.decks.length?STATE.decks.length+' '+plural(STATE.decks.length,'колода','колоды','колод'):''}</div>`;
+    <button class="gear" id="gearBtn" aria-label="Настройки">⚙</button>`;
+  $('gearBtn').onclick=()=>go({name:'settings'});
   if(!STATE.decks.length){
     root.innerHTML=`
       <div class="empty">
@@ -369,12 +572,22 @@ function Home(){
       </div>
       <div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
   } else {
+    const studied=allCards().filter(isStudied);
+    const dueAll=studied.filter(c=>(c.due||0)<=nowMs()).length;
+    const banner = studied.length ? `<button class="review-all" id="reviewAll">
+        <div class="ra-l">
+          <div class="ra-t">Повторить всё</div>
+          <div class="ra-s">${studied.length} ${plural(studied.length,'изученное слово','изученных слова','изученных слов')} из всех списков</div>
+        </div>
+        <span class="chip ${dueAll?'due':'done'}">${dueAll?dueAll+' к повтору':'✓ всё в срок'}</span>
+      </button>` : '';
     const cards=STATE.decks.map(d=>{
       const s=deckStats(d);
-      const pct=s.total?Math.round(s.learned/s.total*100):0;
-      let chip = s.due>0
-        ? `<span class="chip due">${s.due} к повтору</span>`
-        : (s.learned===s.total ? `<span class="chip done">✓ выучено</span>` : `<span class="chip">${pct}%</span>`);
+      const pct=s.total?Math.round(s.studied/s.total*100):0;
+      let chip = s.fresh>0
+        ? `<span class="chip new">${s.fresh} ${plural(s.fresh,'новое','новых','новых')}</span>`
+        : (s.due>0 ? `<span class="chip due">${s.due} к повтору</span>`
+        : (s.mastered===s.total ? `<span class="chip done">✓ выучено</span>` : `<span class="chip">${pct}%</span>`));
       return `<button class="deck" data-deck="${d.id}">
         <div class="row">
           <div>
@@ -386,8 +599,9 @@ function Home(){
         <div class="bar"><i style="width:${pct}%"></i></div>
       </button>`;
     }).join('');
-    root.innerHTML = cards + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
+    root.innerHTML = banner + cards + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
     root.querySelectorAll('.deck').forEach(el=>el.onclick=()=>openDeckSheet(el.dataset.deck));
+    const ra=$('reviewAll'); if(ra) ra.onclick=openReviewSheet;
   }
   $('newBtn').onclick=()=>go({name:'import'});
 }
@@ -442,20 +656,32 @@ function Import(){
 function openDeckSheet(deckId){
   const d=STATE.decks.find(x=>x.id===deckId); if(!d) return;
   const s=deckStats(d); haptic('light');
+  const modes=[['mixed','Смешанно'],['choice','Выбор из 4'],['build','Сборка'],['flip','Карточки']];
   const sh=$('sheet');
+  const learnAct = s.fresh>0
+    ? `<button class="sheet-act primary" data-a="learn"><span class="ic">✱</span>
+         <span>Учить новые слова <b>· ${s.fresh}</b></span></button>`
+    : `<div class="sheet-act muted"><span class="ic">✓</span><span>Все слова изучены</span></div>`;
   sh.innerHTML=`
     <div class="grab"></div>
     <h3>${esc(d.name)}</h3>
-    <p class="sub">${s.total} ${plural(s.total,'слово','слова','слов')} · ${s.learned} изучается · ${s.mastered} выучено</p>
-    <button class="sheet-act" data-a="study"><span class="ic">▶</span>
-      <span>${s.due>0?`Повторить (${s.due})`:'Учить сейчас'}</span></button>
-    <button class="sheet-act" data-a="all"><span class="ic">⟳</span><span>Пройти все слова</span></button>
+    <p class="sub">${s.fresh} новых · ${s.learning} изучается · ${s.mastered} выучено</p>
+    ${learnAct}
+    ${s.studied>0?`
+      <div class="chips-label">Как повторять</div>
+      <div class="modechips">${modes.map(([v,l])=>`<button class="mchip${v===studyMode?' on':''}" data-m="${v}">${l}</button>`).join('')}</div>
+      <button class="sheet-act" data-a="repeat"><span class="ic">⟳</span>
+        <span>Повторить${s.due>0?` · ${s.due} к сроку`:` · ${s.studied}`}</span></button>`:''}
     <button class="sheet-act" data-a="words"><span class="ic">≡</span><span>Список слов</span></button>
     <button class="sheet-act danger" data-a="del"><span class="ic">✕</span><span>Удалить колоду</span></button>`;
+  sh.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{
+    studyMode=b.dataset.m; haptic('sel');
+    sh.querySelectorAll('.mchip').forEach(x=>x.classList.toggle('on',x.dataset.m===studyMode));
+  });
   sh.querySelectorAll('.sheet-act').forEach(b=>b.onclick=()=>{
-    const a=b.dataset.a; closeSheet();
-    if(a==='study') go({name:'study',deckId,mode:'due'});
-    else if(a==='all') go({name:'study',deckId,mode:'all'});
+    const a=b.dataset.a; if(!a) return; closeSheet();
+    if(a==='learn') go({name:'learn',deckId});
+    else if(a==='repeat') go({name:'study',deckId,scope:'repeat',exmode:studyMode});
     else if(a==='words') go({name:'words',deckId});
     else if(a==='del'){
       if(confirm(`Удалить «${d.name}»? Это действие нельзя отменить.`)){
@@ -469,80 +695,323 @@ function openSheet(){ $('sheetBack').classList.add('on'); $('sheet').classList.a
 function closeSheet(){ $('sheetBack').classList.remove('on'); $('sheet').classList.remove('on'); }
 $('sheetBack').onclick=closeSheet;
 
-/* ---------- STUDY ---------- */
+/* повторение всех изученных слов из всех списков */
+function openReviewSheet(){
+  const studied=allCards().filter(isStudied);
+  if(!studied.length) return;
+  haptic('light');
+  const due=studied.filter(c=>(c.due||0)<=nowMs()).length;
+  const modes=[['mixed','Смешанно'],['choice','Выбор из 4'],['build','Сборка'],['flip','Карточки']];
+  const sh=$('sheet');
+  sh.innerHTML=`
+    <div class="grab"></div>
+    <h3>Повторить всё</h3>
+    <p class="sub">${studied.length} ${plural(studied.length,'изученное слово','изученных слова','изученных слов')} · ${due} к повтору</p>
+    <div class="modechips">${modes.map(([v,l])=>`<button class="mchip${v===studyMode?' on':''}" data-m="${v}">${l}</button>`).join('')}</div>
+    <button class="sheet-act" data-a="due"><span class="ic">▶</span>
+      <span>${due>0?`Повторить к сроку (${due})`:'Повторить всё'}</span></button>
+    <button class="sheet-act" data-a="all"><span class="ic">⟳</span><span>Пройти все изученные</span></button>`;
+  sh.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{
+    studyMode=b.dataset.m; haptic('sel');
+    sh.querySelectorAll('.mchip').forEach(x=>x.classList.toggle('on',x.dataset.m===studyMode));
+  });
+  sh.querySelectorAll('.sheet-act').forEach(b=>b.onclick=()=>{
+    const a=b.dataset.a; closeSheet();
+    go({name:'study',deckId:'__all__',scope:a==='all'?'all':'due',exmode:studyMode});
+  });
+  openSheet();
+}
+
+/* ---------- STUDY (карточки · выбор из 4 · сборка слова) ---------- */
 let session=null;
-function Study(deckId, mode){
+let studyMode='mixed';
+const cardParts=c=>(c.parts&&c.parts.length)?c.parts:pinyinParts(c.hanzi,c.pinyin);
+const chars=s=>Array.from(s);              // unicode-safe split
+function allCards(){ const a=[]; for(const d of STATE.decks) for(const c of d.cards) a.push(c); return a; }
+
+function Study(deckId, scope, exmode){
+  let d;
+  if(deckId==='__all__'){
+    const cards=allCards().filter(isStudied);
+    if(!cards.length){ nav=[{name:'home'}]; return render(); }
+    d={ id:'__all__', name:'Повторение всех слов', cards };
+  } else {
+    d=STATE.decks.find(x=>x.id===deckId);
+    if(!d){ nav=[{name:'home'}]; return render(); }
+  }
+  topC.innerHTML=`<div class="screen-title">${esc(d.name)}</div>`;
+  let pool = scope==='repeat' ? d.cards.filter(isStudied)
+           : scope==='all'    ? d.cards.slice()
+           : d.cards.filter(c=>isStudied(c)&&(c.due||0)<=nowMs());
+  if(!pool.length) pool=d.cards.filter(isStudied);
+  if(!pool.length) pool=d.cards.slice();
+  shuffle(pool);
+  session={ kind:'study', deck:d, queue:pool.map(c=>c.id), total:pool.length, mode:exmode||'mixed',
+            learnedIds:new Set(), repeatedIds:new Set(), locked:false };
+  nextExercise();
+}
+
+/* ---------- LEARN: знакомство (карточка) + проверка (викторина), по N слов ---------- */
+function Learn(deckId){
   const d=STATE.decks.find(x=>x.id===deckId);
   if(!d){ nav=[{name:'home'}]; return render(); }
   topC.innerHTML=`<div class="screen-title">${esc(d.name)}</div>`;
-
-  let pool = mode==='all' ? d.cards.slice() : d.cards.filter(c=>(c.due||0)<=nowMs());
-  if(!pool.length) pool=d.cards.slice();
-  shuffle(pool);
-  session={ deck:d, queue:pool.map(c=>c.id), total:pool.length,
-            learnedIds:new Set(), repeatedIds:new Set(), flipped:false };
-  drawCard();
+  const fresh=d.cards.filter(isNew);                  // ещё не изученные, по порядку списка
+  if(!fresh.length){                                  // учить нечего
+    return LearnSummary({ deckId, count:0, remaining:0 });
+  }
+  const batch=fresh.slice(0, learnBatch());
+  batch.forEach(c=>{ c.introduced=true; });           // помечаем как начатые
+  persist();
+  const steps=[];
+  batch.forEach(c=>{ steps.push({id:c.id,ex:'flip'}); steps.push({id:c.id,ex:'choice'}); });
+  session={ kind:'learn', deck:d, steps, stepIdx:0, batchSize:batch.length,
+            remainingAfter:fresh.length-batch.length, mode:'choice',
+            cur:null, learnedIds:new Set(), repeatedIds:new Set(), locked:false };
+  nextStep();
 }
-function drawCard(){
+function nextStep(){
   const s=session;
-  if(!s.queue.length){ return finishSession(); }
-  const card=s.deck.cards.find(c=>c.id===s.queue[0]);
-  const doneCount = s.total - new Set(s.queue).size;
-  const pct=Math.round(doneCount/s.total*100);
-  const parts = card.parts && card.parts.length ? card.parts : pinyinParts(card.hanzi, card.pinyin);
-  s.flipped=false;
+  s.locked=false; s.resolving=false;
+  if(s.stepIdx>=s.steps.length) return finishLearnBatch();
+  const step=s.steps[s.stepIdx];
+  s.cur=step.id; s.stepKind=step.ex;
+  const card=s.deck.cards.find(c=>c.id===step.id);
+  if(step.ex==='flip') exFlip(card);
+  else exChoice(card);
+}
+function finishLearnBatch(){
+  const s=session;
+  go({name:'learnsummary', data:{ deckId:s.deck.id, count:s.batchSize, remaining:s.remainingAfter }});
+}
+function LearnSummary(data){
+  const d=STATE.decks.find(x=>x.id===data.deckId);
+  topC.innerHTML=`<div class="screen-title">${d?esc(d.name):'Готово'}</div>`;
+  setBack(false); nav=[{name:'home'},{name:'learnsummary',data}];
+  const done = data.count>0;
+  root.innerHTML=`
+    <div class="center-wrap">
+      <div class="big">${done?'学':'好'}</div>
+      <h2>${done?`Изучено ${data.count} ${plural(data.count,'слово','слова','слов')}`:'Все слова уже изучены'}</h2>
+      ${data.remaining>0
+        ? `<p class="cw-sub">Осталось ${data.remaining} ${plural(data.remaining,'новое слово','новых слова','новых слов')} в списке</p>`
+        : `<p class="cw-sub">Можно закрепить их повторением</p>`}
+      <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:11px;margin-top:24px">
+        ${data.remaining>0?`<button class="cta" id="contBtn">Учить дальше · ${Math.min(learnBatch(),data.remaining)}</button>`:''}
+        <button class="cta ${data.remaining>0?'ghost':''}" id="repeatBtn">Повторить выученные</button>
+        <button class="cta ghost" id="homeBtn">На главную</button>
+      </div>
+    </div>`;
+  const cont=$('contBtn'); if(cont) cont.onclick=()=>{ nav=[{name:'home'}]; go({name:'learn',deckId:data.deckId}); };
+  $('repeatBtn').onclick=()=>{ nav=[{name:'home'}]; go({name:'study',deckId:data.deckId,scope:'repeat',exmode:studyMode}); };
+  $('homeBtn').onclick=()=>{ nav=[{name:'home'}]; render(); };
+}
+
+// choose exercise type for a card
+function exerciseFor(card){
+  const multi = chars(card.hanzi).length>=2;
+  if(session.mode==='flip') return 'flip';
+  if(session.mode==='choice') return 'choice';
+  if(session.mode==='build') return multi ? 'build' : 'choice';
+  // mixed
+  const r=Math.random();
+  if(multi){ if(r<0.40) return 'choice'; if(r<0.70) return 'build'; return 'flip'; }
+  return r<0.6 ? 'choice' : 'flip';
+}
+
+function studyShell(inner){
+  const s=session;
+  let pct, label, badge='';
+  if(s.kind==='learn'){
+    pct=Math.round(s.stepIdx/s.steps.length*100);
+    const wordNum=Math.floor(s.stepIdx/2)+1;
+    label=`${Math.min(wordNum,s.batchSize)} / ${s.batchSize}`;
+    badge=`<span class="phase">${s.stepKind==='flip'?'знакомство':'проверка'}</span>`;
+  } else {
+    const doneCount = s.total - new Set(s.queue).size;
+    pct=Math.round(doneCount/s.total*100);
+    label=`${Math.min(doneCount+1,s.total)} / ${s.total}`;
+  }
   root.innerHTML=`
     <div class="study">
       <div class="studybar">
-        <span class="ct">${Math.min(doneCount+1,s.total)} / ${s.total}</span>
+        <span class="ct">${label}</span>
+        ${badge}
         <div class="pbar"><i style="width:${pct}%"></i></div>
       </div>
-      <div class="stage">
-        <div class="card swap" id="card">
-          <div class="face front">
-            <div class="hanzi">${esc(card.hanzi)}</div>
-            <div class="pinyin">${renderPinyin(parts)}</div>
-            <div class="flip-hint">нажмите, чтобы увидеть перевод</div>
-          </div>
-          <div class="face back">
-            <div class="hz-mini">${esc(card.hanzi)}</div>
-            <div class="ru">${esc(card.translation)||'—'}</div>
-            <div class="py-mini">${renderPinyin(parts)}</div>
-          </div>
-        </div>
-      </div>
-      <div id="ctrl"></div>
+      ${inner}
       <div class="legend">
-        <span><i style="background:var(--t1)"></i>1-й тон</span>
-        <span><i style="background:var(--t2)"></i>2-й</span>
-        <span><i style="background:var(--t3)"></i>3-й</span>
-        <span><i style="background:var(--t4)"></i>4-й</span>
-        <span><i style="background:var(--t5)"></i>лёгкий</span>
+        <span><i style="background:var(--t1)"></i>1</span>
+        <span><i style="background:var(--t2)"></i>2</span>
+        <span><i style="background:var(--t3)"></i>3</span>
+        <span><i style="background:var(--t4)"></i>4</span>
+        <span><i style="background:var(--t5)"></i>·</span>
       </div>
     </div>`;
-  const cardEl=$('card'), ctrl=$('ctrl');
-  ctrl.innerHTML=`<div class="tapcatch">нажмите на карточку</div>`;
-  const flip=()=>{
-    if(s.flipped) return;
-    s.flipped=true; cardEl.classList.add('flipped'); haptic('light');
+}
+
+function nextExercise(){
+  const s=session;
+  if(!s.queue.length) return finishSession();
+  s.locked=false; s.resolving=false;
+  s.cur=s.queue[0];
+  const card=s.deck.cards.find(c=>c.id===s.cur);
+  const ex=exerciseFor(card);
+  if(ex==='flip') return exFlip(card);
+  if(ex==='choice') return exChoice(card);
+  if(ex==='build') return exBuild(card);
+  exFlip(card);
+}
+
+// resolve current card. learn: advance step; study: schedule + requeue on miss
+function resolve(ok){
+  const s=session; if(s.resolving) return;
+  const id=s.cur;
+  const card=s.deck.cards.find(c=>c.id===id);
+  if(!card) return;
+  s.resolving=true; s.locked=true;
+  schedule(card, ok);
+  if(ok) s.learnedIds.add(id); else s.repeatedIds.add(id);
+  if(s.kind==='learn'){
+    persist();
+    setTimeout(()=>{ s.resolving=false; s.stepIdx++; nextStep(); }, ok?260:560);
+  } else {
+    s.queue.shift();
+    if(!ok){ const pos=Math.min(3,s.queue.length); s.queue.splice(pos,0,id); }
+    persist();
+    setTimeout(()=>{ s.resolving=false; nextExercise(); }, ok?260:520);
+  }
+}
+
+/* --- 1) FLIP card (recall) --- */
+function exFlip(card){
+  const parts=cardParts(card);
+  const showFront = STATE.settings.pinyinFront!==false;
+  studyShell(`
+    <div class="stage">
+      <div class="card swap" id="card">
+        <div class="face front">
+          <div class="hanzi">${esc(card.hanzi)}</div>
+          ${showFront?`<div class="pinyin">${renderPinyin(parts)}</div>`:''}
+          <div class="flip-hint">нажмите, чтобы увидеть перевод</div>
+        </div>
+        <div class="face back">
+          <div class="hz-mini">${esc(card.hanzi)}</div>
+          <div class="ru">${esc(card.translation)||'—'}</div>
+          <div class="py-mini">${renderPinyin(parts)}</div>
+        </div>
+      </div>
+    </div>
+    <div id="ctrl"><div class="tapcatch">нажмите на карточку</div></div>`);
+  const cardEl=$('card'), ctrl=$('ctrl'); let flipped=false;
+  cardEl.onclick=()=>{
+    if(flipped) return; flipped=true; cardEl.classList.add('flipped'); haptic('light');
     ctrl.innerHTML=`<div class="answers">
       <button class="ans no" id="noBtn">Не знаю</button>
       <button class="ans yes" id="yesBtn">Знаю</button></div>`;
-    $('noBtn').onclick=()=>answer(false);
-    $('yesBtn').onclick=()=>answer(true);
+    $('noBtn').onclick=()=>{ haptic('medium'); resolve(false); };
+    $('yesBtn').onclick=()=>{ notify('success'); resolve(true); };
   };
-  cardEl.onclick=flip;
 }
-function answer(ok){
-  const s=session, id=s.queue[0];
-  const card=s.deck.cards.find(c=>c.id===id);
-  schedule(card, ok);
-  if(ok){ s.learnedIds.add(id); s.queue.shift(); notify('success'); }
-  else { s.repeatedIds.add(id); s.queue.shift();
-         const pos=Math.min(3,s.queue.length); s.queue.splice(pos,0,id); haptic('medium'); }
-  persist();
-  drawCard();
+
+/* --- 2) CHOICE: 4 options, direction random --- */
+function distractors(card, key, n){
+  let pool=session.deck.cards.filter(c=>c.id!==card.id);
+  if(pool.length<n) pool=pool.concat(allCards().filter(c=>c.id!==card.id));
+  const seen=new Set([card[key]]); const out=[];
+  shuffle(pool);
+  for(const c of pool){ if(seen.has(c[key])) continue; seen.add(c[key]); out.push(c); if(out.length>=n) break; }
+  return out;
 }
+function exChoice(card){
+  const s=session;
+  const ru2cn = Math.random()<0.5;                 // direction
+  const key = ru2cn ? 'hanzi' : 'translation';
+  const opts = shuffle([card, ...distractors(card, key, 3)]);
+  const prompt = ru2cn
+    ? `<div class="q-prompt"><div class="ru-big">${esc(card.translation)||'—'}</div></div>
+       <div class="q-label">Выберите слово</div>`
+    : `<div class="q-prompt"><div class="hz-big">${esc(card.hanzi)}</div>
+         <div class="py-big">${renderPinyin(cardParts(card))}</div></div>
+       <div class="q-label">Выберите перевод</div>`;
+  const optHtml = opts.map(o=>{
+    const inner = ru2cn
+      ? `<span class="o-hz">${esc(o.hanzi)}</span><span class="o-py hide">${renderPinyin(cardParts(o))}</span>`
+      : `<span class="o-ru">${esc(o.translation)||'—'}</span>`;
+    return `<button class="opt" data-id="${o.id}">${inner}</button>`;
+  }).join('');
+  studyShell(`${prompt}<div class="options ${ru2cn?'cols2':'col1'}">${optHtml}</div>`);
+  root.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(s.locked) return; s.locked=true;
+    const ok = b.dataset.id===card.id;
+    const correctBtn = root.querySelector(`.opt[data-id="${card.id}"]`);
+    root.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    if(ok){ b.classList.add('correct'); notify('success'); }
+    else { b.classList.add('wrong'); if(correctBtn) correctBtn.classList.add('correct'); haptic('medium'); }
+    // в направлении рус→кит пиньинь скрыт как подсказка — показываем после ответа
+    if(ru2cn) root.querySelectorAll('.opt.correct .o-py,.opt.wrong .o-py').forEach(p=>p.classList.remove('hide'));
+    resolve(ok);
+  });
+}
+
+/* --- 3) BUILD: assemble hanzi in order --- */
+function exBuild(card){
+  const s=session;
+  const target=chars(card.hanzi);
+  // distractor characters from other words
+  const others=allCards().filter(c=>c.id!==card.id).flatMap(c=>chars(c.hanzi));
+  const extra=[]; shuffle(others);
+  for(const ch of others){ if(target.indexOf(ch)===-1 && extra.indexOf(ch)===-1){ extra.push(ch); if(extra.length>=Math.min(2,Math.max(1,target.length-1))) break; } }
+  const bank = shuffle(target.concat(extra).map((ch,i)=>({ch, key:'t'+i})));
+  const picked=[];                                  // array of bank items
+  studyShell(`
+    <div class="q-prompt build">
+      <div class="ru-big">${esc(card.translation)||'—'}</div>
+    </div>
+    <div class="q-label">Соберите слово</div>
+    <div class="slots" id="slots"></div>
+    <div class="bank" id="bank"></div>`);
+  const slotsEl=$('slots'), bankEl=$('bank');
+  function paint(){
+    slotsEl.innerHTML = target.map((_,i)=>{
+      const it=picked[i];
+      return it ? `<button class="slot filled" data-pi="${i}">${esc(it.ch)}</button>`
+                : `<span class="slot"></span>`;
+    }).join('');
+    bankEl.innerHTML = bank.map(it=>{
+      const used = picked.indexOf(it)>-1;
+      return `<button class="tile${used?' used':''}" data-key="${it.key}"${used?' disabled':''}>${esc(it.ch)}</button>`;
+    }).join('');
+    slotsEl.querySelectorAll('.slot.filled').forEach(b=>b.onclick=()=>{
+      if(s.locked) return; const i=+b.dataset.pi; picked.splice(i,1); haptic('sel'); paint();
+    });
+    bankEl.querySelectorAll('.tile:not(.used)').forEach(b=>b.onclick=()=>{
+      if(s.locked) return;
+      const it=bank.find(x=>x.key===b.dataset.key);
+      if(picked.length>=target.length) return;
+      picked.push(it); haptic('sel'); paint();
+      if(picked.length===target.length) check();
+    });
+  }
+  function check(){
+    s.locked=true;
+    const ok = picked.map(p=>p.ch).join('')===card.hanzi;
+    slotsEl.querySelectorAll('.slot.filled').forEach(b=>b.classList.add(ok?'ok':'bad'));
+    const pr=root.querySelector('.q-prompt.build');                 // показываем пиньинь уже после ответа
+    if(pr && !pr.querySelector('.py-hint')) pr.insertAdjacentHTML('beforeend', `<div class="py-hint">${renderPinyin(cardParts(card))}</div>`);
+    if(ok){ notify('success'); resolve(true); }
+    else {
+      haptic('medium'); slotsEl.classList.add('shake');
+      // reveal correct order
+      setTimeout(()=>{
+        slotsEl.innerHTML = target.map(ch=>`<button class="slot filled ok">${esc(ch)}</button>`).join('');
+      }, 360);
+      resolve(false);
+    }
+  }
+  paint();
+}
+
 function finishSession(){
   const s=session;
   go({name:'summary', data:{ deckId:s.deck.id, learned:s.learnedIds.size, repeated:s.repeatedIds.size, total:s.total }});
@@ -566,7 +1035,7 @@ function Summary(data){
         <button class="cta ghost" id="homeBtn">На главную</button>
       </div>
     </div>`;
-  $('againBtn').onclick=()=>{ nav=[{name:'home'}]; go({name:'study',deckId:data.deckId,mode:'all'}); };
+  $('againBtn').onclick=()=>{ nav=[{name:'home'}]; go({name:'study',deckId:data.deckId,scope:'all',exmode:studyMode}); };
   $('homeBtn').onclick=()=>{ nav=[{name:'home'}]; render(); };
 }
 
@@ -588,7 +1057,103 @@ function Words(deckId){
       <div class="box">${lbl}</div>
     </div>`;}).join('')}</div>
     <div class="fabwrap"><button class="cta" id="studyAll">Учить эти слова</button></div>`;
-  $('studyAll').onclick=()=>{ nav=nav.filter(n=>n.name!=='words'); go({name:'study',deckId,mode:'all'}); };
+  $('studyAll').onclick=()=>{ nav=nav.filter(n=>n.name!=='words'); go({name:'study',deckId,scope:'all',exmode:studyMode}); };
+}
+
+/* ---------- SETTINGS / КАБИНЕТ ---------- */
+function tgUser(){ try{ return TG && TG.initDataUnsafe && TG.initDataUnsafe.user || null; }catch(e){ return null; } }
+function learnBatch(){ return STATE.settings.learnBatch||10; }
+
+function Settings(){
+  setBack(true);
+  topC.innerHTML=`<div class="screen-title">Настройки</div>`;
+  const st=STATE.settings, u=tgUser();
+  const who = u ? esc([u.first_name,u.last_name].filter(Boolean).join(' ')||('@'+(u.username||u.id))) : 'Гость';
+  const sub = u ? (u.username?'@'+esc(u.username):'id '+esc(String(u.id))) : '';
+  root.innerHTML=`
+    <div class="set-card">
+      <div class="set-acc">
+        <div class="set-ava">${who.slice(0,1).toUpperCase()}</div>
+        <div><div class="set-name">${who}</div><div class="set-id">${sub}</div></div>
+      </div>
+      <div class="set-row"><span>Синхронизация</span><b id="syncStatus">${esc(syncLabel())}</b></div>
+      <p class="set-note">${tgCloud
+        ? 'Карточки привязаны к вашему аккаунту Telegram и автоматически доступны на всех устройствах, где вы вошли в Telegram.'
+        : 'Сейчас данные хранятся только в этом браузере. Откройте приложение внутри Telegram, чтобы карточки сохранялись в вашем аккаунте и не терялись при входе с других устройств.'}</p>
+    </div>
+
+    <div class="set-group">Напоминания</div>
+    <div class="set-card">
+      <label class="set-toggle">
+        <span>Ежедневное напоминание</span>
+        <input type="checkbox" id="remOn" ${st.reminders?'checked':''}>
+        <i class="sw"></i>
+      </label>
+      <div class="set-row sep"><span>Время</span>
+        <input type="time" id="remTime" value="${esc(st.reminderTime||'19:00')}" ${st.reminders?'':'disabled'}></div>
+      <p class="set-note">Когда подходит время и есть слова к повтору, приложение напомнит при открытии. Чтобы получать пуш-уведомление при закрытом приложении, подключите бота-напоминалку (см. файл <b>reminder-bot.py</b>).</p>
+    </div>
+
+    <div class="set-group">Изучение</div>
+    <div class="set-card">
+      <div class="set-row"><span>Слов за один заход</span>
+        <div class="stepper"><button id="bMinus">−</button><b id="batchVal">${learnBatch()}</b><button id="bPlus">+</button></div></div>
+      <label class="set-toggle sep">
+        <span>Пиньинь на лицевой стороне карточки</span>
+        <input type="checkbox" id="pyFront" ${st.pinyinFront?'checked':''}>
+        <i class="sw"></i>
+      </label>
+    </div>
+
+    <div class="set-group">Данные</div>
+    <div class="set-card">
+      <button class="set-line" id="exportBtn"><span class="ic">↧</span><span>Экспорт (резервная копия)</span></button>
+      <button class="set-line sep" id="importBtn"><span class="ic">↥</span><span>Импорт из копии</span></button>
+    </div>
+    <p class="set-foot">汉字 · Карточки — словарь пиньиня встроен, работает офлайн.</p>`;
+
+  $('remOn').onchange=e=>{ st.reminders=e.target.checked; $('remTime').disabled=!st.reminders; persist(); haptic('sel'); };
+  $('remTime').onchange=e=>{ st.reminderTime=e.target.value||'19:00'; persist(); };
+  const setBatch=v=>{ st.learnBatch=Math.max(5,Math.min(30,v)); $('batchVal').textContent=st.learnBatch; persist(); haptic('sel'); };
+  $('bMinus').onclick=()=>setBatch(learnBatch()-5);
+  $('bPlus').onclick=()=>setBatch(learnBatch()+5);
+  $('pyFront').onchange=e=>{ st.pinyinFront=e.target.checked; persist(); haptic('sel'); };
+  $('exportBtn').onclick=exportData;
+  $('importBtn').onclick=importData;
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(serialize(STATE),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='hanzi-cards-backup.json'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); haptic('light');
+}
+function importData(){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json,.json';
+  inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const r=new FileReader();
+    r.onload=()=>{ try{ const obj=JSON.parse(r.result);
+        if(!obj||!Array.isArray(obj.decks)) throw 0;
+        STATE=normalize(obj); persist(); notify('success'); nav=[{name:'home'}]; render();
+      }catch(e){ alert('Не удалось прочитать файл резервной копии.'); } };
+    r.readAsText(f); };
+  inp.click();
+}
+
+/* ---------- Напоминание при открытии ---------- */
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function dueEverywhere(){ return allCards().filter(c=>isStudied(c)&&(c.due||0)<=nowMs()).length; }
+function maybeRemind(){
+  const st=STATE.settings;
+  if(!st.reminders) return;
+  if(st.lastReminded===todayStr()) return;
+  const [h,m]=(st.reminderTime||'19:00').split(':').map(Number);
+  const now=new Date(); const passed = now.getHours()>h || (now.getHours()===h && now.getMinutes()>=m);
+  if(!passed) return;
+  const due=dueEverywhere();
+  if(due<=0) return;
+  st.lastReminded=todayStr(); persist();
+  const msg=`Пора повторить: ${due} ${plural(due,'слово','слова','слов')} ждут.`;
+  if(TG && TG.showPopup){ try{ TG.showPopup({title:'汉字 Карточки', message:msg,
+    buttons:[{id:'go',type:'default',text:'Повторить'},{type:'cancel'}]}, id=>{ if(id==='go') openReviewSheet(); }); return; }catch(e){} }
 }
 
 /* ---------- utils ---------- */
@@ -599,6 +1164,8 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.random()*(i+1)|
 /* ---------- boot ---------- */
 nav=[{name:'home'}];
 render();
+bootSync();
+setTimeout(maybeRemind, 600);
 if(!PY){ console.warn('pinyin-pro не загрузился — автоподбор пиньиня недоступен.'); }
 </script>
 </body>
