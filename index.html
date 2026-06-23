@@ -198,6 +198,18 @@ input,textarea{font-family:inherit;color:inherit}
 .ans.yes{color:var(--t2)} .ans.yes:active{background:color-mix(in srgb,var(--t2) 12%,var(--surface))}
 .tapcatch{margin-top:16px;text-align:center;color:var(--muted);font-size:14px;font-weight:500}
 
+/* highlight the answer side of a flip card after «Не знаю» */
+.face.back.reveal{border-color:var(--t2);box-shadow:0 0 0 2px var(--t2), var(--shadow-card)}
+
+/* hint shown after a wrong answer: extra time + tap to continue */
+.cont-hint{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));
+  transform:translateX(-50%) translateY(14px);z-index:60;display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:var(--text);color:var(--bg);padding:10px 20px;border-radius:999px;text-align:center;max-width:92vw;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;transition:opacity .2s ease,transform .2s ease}
+.cont-hint.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.cont-hint .ch-correct{font-size:13px;font-weight:680}
+.cont-hint .ch-tap{font-size:11px;font-weight:600;opacity:.72}
+
 /* legend */
 .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:14px}
 .legend span{font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;font-weight:600}
@@ -227,8 +239,12 @@ input,textarea{font-family:inherit;color:inherit}
 .opt .o-py{font-size:13px;font-weight:600;display:flex;gap:.35em;flex-wrap:wrap;justify-content:center}
 .opt .o-py.hide{display:none}
 .opt .o-ru{font-size:16px;font-weight:560;text-align:center;line-height:1.3}
-.opt.correct{border-color:var(--t2);background:color-mix(in srgb,var(--t2) 14%,var(--surface))}
-.opt.wrong{border-color:var(--t1);background:color-mix(in srgb,var(--t1) 12%,var(--surface))}
+.opt.correct{position:relative;border-color:var(--t2);background:var(--t2);
+  box-shadow:0 6px 20px color-mix(in srgb,var(--t2) 40%,transparent)}
+.opt.correct, .opt.correct *{color:#fff}
+.opt.correct::after{content:"✓";position:absolute;top:8px;right:12px;font-size:15px;font-weight:800;opacity:.92}
+.opt.wrong{border-color:var(--t1);background:var(--t1)}
+.opt.wrong, .opt.wrong *{color:#fff}
 
 .slots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:62px;margin-bottom:22px}
 .slot{min-width:52px;height:56px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;
@@ -236,8 +252,8 @@ input,textarea{font-family:inherit;color:inherit}
 span.slot{border:2px dashed var(--hairline)}
 .slot.filled{background:var(--surface);border:1.5px solid var(--text);box-shadow:var(--shadow);transition:transform .1s}
 .slot.filled:active{transform:scale(.94)}
-.slot.ok{border-color:var(--t2);color:var(--t2)}
-.slot.bad{border-color:var(--t1);color:var(--t1)}
+.slot.ok{border-color:var(--t2);background:var(--t2);color:#fff;box-shadow:0 4px 16px color-mix(in srgb,var(--t2) 36%,transparent)}
+.slot.bad{border-color:var(--t1);background:var(--t1);color:#fff}
 .bank{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
 .tile{min-width:54px;height:58px;border-radius:14px;background:var(--surface);border:1.5px solid var(--hairline);
   font-family:var(--han);font-size:29px;font-weight:500;box-shadow:var(--shadow);transition:transform .1s,opacity .15s}
@@ -766,7 +782,7 @@ function openDeckSheet(deckId){
       <div class="chips-label">Как повторять</div>
       <div class="modechips">${modes.map(([v,l])=>`<button class="mchip${v===studyMode?' on':''}" data-m="${v}">${l}</button>`).join('')}</div>
       <button class="sheet-act" data-a="repeat"><span class="ic">⟳</span>
-        <span>Повторить${s.due>0?` · ${s.due} к сроку`:` · ${s.studied}`}</span></button>`:''}
+        <span>Повторить · ${Math.min(learnBatch(),s.studied)} ${plural(Math.min(learnBatch(),s.studied),'слово','слова','слов')}</span></button>`:''}
     <button class="sheet-act" data-a="words"><span class="ic">≡</span><span>Список слов</span></button>
     <button class="sheet-act danger" data-a="del"><span class="ic">✕</span><span>Удалить колоду</span></button>`;
   sh.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{
@@ -805,8 +821,8 @@ function openReviewSheet(){
     <p class="sub">${studied.length} ${plural(studied.length,'изученное слово','изученных слова','изученных слов')} · ${due} к повтору</p>
     <div class="modechips">${modes.map(([v,l])=>`<button class="mchip${v===studyMode?' on':''}" data-m="${v}">${l}</button>`).join('')}</div>
     <button class="sheet-act" data-a="due"><span class="ic">▶</span>
-      <span>${due>0?`Повторить к сроку (${due})`:'Повторить всё'}</span></button>
-    <button class="sheet-act" data-a="all"><span class="ic">⟳</span><span>Пройти все изученные</span></button>`;
+      <span>Повторить · ${Math.min(learnBatch(),studied.length)} ${plural(Math.min(learnBatch(),studied.length),'слово','слова','слов')}</span></button>
+    <button class="sheet-act" data-a="all"><span class="ic">⟳</span><span>Пройти все изученные · ${studied.length}</span></button>`;
   sh.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{
     studyMode=b.dataset.m; haptic('sel');
     sh.querySelectorAll('.mchip').forEach(x=>x.classList.toggle('on',x.dataset.m===studyMode));
@@ -826,6 +842,22 @@ const chars=s=>Array.from(s);              // unicode-safe split
 function allCards(){ const a=[]; for(const d of STATE.decks) for(const c of d.cards) a.push(c); return a; }
 function hardCards(){ return allCards().filter(c=>c.hard); }
 
+// Набор для повторения: всегда до `limit` слов, выбранных по приоритету —
+// сначала просроченные (чем дольше просрочены, тем раньше), затем те,
+// что дольше всего не повторялись (по времени последнего показа).
+function pickRepeatPool(cards, limit){
+  const now=nowMs();
+  const studied=cards.filter(isStudied).slice();
+  studied.sort((a,b)=>{
+    const da=a.due||0, db=b.due||0;
+    const aDue=da<=now, bDue=db<=now;
+    if(aDue!==bDue) return aDue?-1:1;        // просроченные — вперёд
+    if(aDue&&bDue) return da-db;             // оба просрочены: сильнее просроченные раньше
+    return (a.ts||0)-(b.ts||0);              // не просрочены: дольше не повторявшиеся раньше
+  });
+  return studied.slice(0, Math.max(1,limit));
+}
+
 function Study(deckId, scope, exmode){
   let d;
   if(deckId==='__all__'){
@@ -842,7 +874,7 @@ function Study(deckId, scope, exmode){
   }
   topC.innerHTML=`<div class="screen-title">${esc(d.name)}</div>`;
   let pool = deckId==='__hard__' ? d.cards.slice()
-           : scope==='repeat' ? d.cards.filter(isStudied)
+           : (scope==='repeat'||scope==='due') ? pickRepeatPool(d.cards, learnBatch())
            : scope==='all'    ? d.cards.slice()
            : d.cards.filter(c=>isStudied(c)&&(c.due||0)<=nowMs());
   if(!pool.length) pool=d.cards.filter(isStudied);
@@ -974,15 +1006,50 @@ function resolve(ok){
   s.resolving=true; s.locked=true;
   schedule(card, ok);
   if(ok) s.learnedIds.add(id); else s.repeatedIds.add(id);
+  let advance;
   if(s.kind==='learn'){
     persist();
-    setTimeout(()=>{ s.resolving=false; s.stepIdx++; nextStep(); }, ok?260:560);
+    advance=()=>{ s.resolving=false; s.stepIdx++; nextStep(); };
   } else {
     s.queue.shift();
     if(!ok){ const pos=Math.min(3,s.queue.length); s.queue.splice(pos,0,id); }
     persist();
-    setTimeout(()=>{ s.resolving=false; nextExercise(); }, ok?260:520);
+    advance=()=>{ s.resolving=false; nextExercise(); };
   }
+  if(ok){
+    setTimeout(advance, 260);
+  } else {
+    // неверно → даём время изучить правильный ответ; можно нажать, чтобы продолжить раньше
+    showContinueHint();
+    armContinue(advance, 4000);
+  }
+}
+
+// Показать правильный ответ подольше: авто-переход через delay ИЛИ по нажатию.
+function armContinue(advance, delay){
+  let done=false, guard=true;
+  const fire=()=>{ if(done) return; done=true; cleanup(); advance(); };
+  const onTap=()=>{ if(!guard) fire(); };
+  function cleanup(){
+    clearTimeout(timer); clearTimeout(guardTimer);
+    document.removeEventListener('click',onTap,true);
+    document.removeEventListener('touchstart',onTap,true);
+    hideContinueHint();
+  }
+  const guardTimer=setTimeout(()=>{ guard=false; }, 480); // не считать тот же тап, что дал ответ
+  const timer=setTimeout(fire, delay);
+  document.addEventListener('click',onTap,true);
+  document.addEventListener('touchstart',onTap,true);
+}
+function showContinueHint(){
+  let el=document.getElementById('contHint');
+  if(!el){ el=document.createElement('div'); el.id='contHint'; el.className='cont-hint'; document.body.appendChild(el); }
+  el.innerHTML=`<span class="ch-correct">Запомните правильный ответ</span><span class="ch-tap">нажмите, чтобы продолжить →</span>`;
+  requestAnimationFrame(()=>el.classList.add('on'));
+}
+function hideContinueHint(){
+  const el=document.getElementById('contHint');
+  if(el){ el.classList.remove('on'); setTimeout(()=>{ if(el&&el.parentNode) el.remove(); },220); }
 }
 
 /* --- 1) FLIP card (recall) --- */
@@ -1011,7 +1078,7 @@ function exFlip(card){
     ctrl.innerHTML=`<div class="answers">
       <button class="ans no" id="noBtn">Не знаю</button>
       <button class="ans yes" id="yesBtn">Знаю</button></div>`;
-    $('noBtn').onclick=()=>{ haptic('medium'); resolve(false); };
+    $('noBtn').onclick=()=>{ haptic('medium'); const bk=cardEl.querySelector('.face.back'); if(bk) bk.classList.add('reveal'); resolve(false); };
     $('yesBtn').onclick=()=>{ notify('success'); resolve(true); };
   };
 }
