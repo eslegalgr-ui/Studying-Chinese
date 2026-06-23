@@ -357,6 +357,27 @@ span.slot{border:2px dashed var(--hairline)}
 .wrow .py{font-size:13px;font-weight:600}
 .wrow .tr{font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wrow .box{font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.05em}
+.wrow .wend{display:flex;align-items:center;justify-content:flex-end}
+.wdel{display:none;width:30px;height:30px;border-radius:50%;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--t1) 14%,transparent);color:var(--t1);font-size:14px;font-weight:700;transition:transform .1s}
+.wdel:active{transform:scale(.88)}
+.wlist.editing .wrow .box{display:none}
+.wlist.editing .wdel{display:flex}
+/* word-list toolbar */
+.wl-tools{display:flex;align-items:center;justify-content:space-between;margin:0 2px 12px}
+.wl-count{color:var(--muted);font-size:13.5px;font-weight:600}
+.wl-edit{font-size:14px;font-weight:660;color:var(--cta);padding:6px 10px;border-radius:10px;
+  background:transparent;transition:background .12s}
+.wl-edit.on{color:var(--t2)}
+.wl-edit:active{background:var(--surface-3)}
+.wl-add{display:flex;align-items:center;gap:9px;width:100%;text-align:left;margin-bottom:14px;
+  background:var(--surface);border:1px dashed color-mix(in srgb,var(--cta) 55%,var(--hairline));
+  border-radius:var(--radius-sm);padding:13px 15px;color:var(--cta);font-weight:660;font-size:15px;transition:transform .12s,background .12s}
+.wl-add:active{transform:scale(.99);background:var(--surface-2)}
+.wl-add .ic{font-size:17px;font-weight:700}
+.wl-empty{text-align:center;color:var(--muted);font-size:14px;padding:30px 20px;
+  background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm)}
+.prow.dup{opacity:.5}
 
 .hidden{display:none!important}
 @media (prefers-reduced-motion: reduce){
@@ -418,11 +439,12 @@ const SETTINGS_DEFAULT={ reminders:false, reminderTime:'19:00', learnBatch:10, p
 let _mem=null;
 const uid=()=>Math.random().toString(36).slice(2,10);
 
-function blankState(){ return { v:3, decks:[], settings:Object.assign({},SETTINGS_DEFAULT), deleted:{}, updatedAt:0 }; }
+function blankState(){ return { v:3, decks:[], settings:Object.assign({},SETTINGS_DEFAULT), deleted:{}, delCards:{}, updatedAt:0 }; }
 function normalize(s){
   s=s||blankState();
   if(!Array.isArray(s.decks)) s.decks=[];
   if(!s.deleted||typeof s.deleted!=='object') s.deleted={};
+  if(!s.delCards||typeof s.delCards!=='object') s.delCards={};
   s.settings=Object.assign({},SETTINGS_DEFAULT,s.settings||{});
   for(const d of s.decks){ if(!Array.isArray(d.cards)) d.cards=[];
     d.updatedAt=d.updatedAt||d.createdAt||0;
@@ -433,7 +455,7 @@ function normalize(s){
 }
 // компактная сериализация (parts не храним — пересчитываются из иероглифов)
 function serialize(s){
-  return { v:3, updatedAt:s.updatedAt||nowMs(), settings:s.settings, deleted:s.deleted||{},
+  return { v:3, updatedAt:s.updatedAt||nowMs(), settings:s.settings, deleted:s.deleted||{}, delCards:s.delCards||{},
     decks:s.decks.map(d=>({ id:d.id, name:d.name, createdAt:d.createdAt, updatedAt:d.updatedAt||d.createdAt||0,
       cards:d.cards.map(c=>({ id:c.id, hanzi:c.hanzi, pinyin:c.pinyin, translation:c.translation,
         provided:c.provided?1:0, box:c.box||1, due:c.due||0, learned:c.learned||0,
@@ -445,6 +467,8 @@ function mergeStates(a, b){
   a=normalize(a); b=normalize(b);
   const deleted=Object.assign({}, a.deleted, b.deleted);
   for(const k in a.deleted) if((b.deleted[k]||0)>(a.deleted[k]||0)) deleted[k]=b.deleted[k];
+  const delCards=Object.assign({}, a.delCards, b.delCards);
+  for(const k in a.delCards) if((b.delCards[k]||0)>(a.delCards[k]||0)) delCards[k]=b.delCards[k];
   const ids=new Set([...a.decks,...b.decks].map(d=>d.id));
   const out=[];
   for(const id of ids){
@@ -457,12 +481,14 @@ function mergeStates(a, b){
       if(!byId[c.id]){ byId[c.id]=c; order.push(c.id); }
       else if((c.ts||0)>(byId[c.id].ts||0)) byId[c.id]=c; } };
     take(base); take(da===base?db:da);                          // порядок ведущей колоды, затем добор
+    const cards=order
+      .filter(cid=>!((delCards[cid]||0) && (delCards[cid]||0)>=(byId[cid].ts||0)))  // удалённые карточки
+      .map(cid=>byId[cid]);
     out.push({ id, name:base.name, createdAt:base.createdAt,
-      updatedAt:Math.max(da?da.updatedAt||0:0, db?db.updatedAt||0:0),
-      cards:order.map(cid=>byId[cid]) });
+      updatedAt:Math.max(da?da.updatedAt||0:0, db?db.updatedAt||0:0), cards });
   }
   const newer = (b.updatedAt||0)>=(a.updatedAt||0) ? b : a;
-  return normalize({ v:3, decks:out, deleted, settings:newer.settings, updatedAt:Math.max(a.updatedAt||0,b.updatedAt||0) });
+  return normalize({ v:3, decks:out, deleted, delCards, settings:newer.settings, updatedAt:Math.max(a.updatedAt||0,b.updatedAt||0) });
 }
 // --- local (sync) с переносом данных из прежних версий ---
 const OLD_KEYS=['hanzi_cards_v1'];
@@ -697,6 +723,7 @@ function render(){
   if(cur.name==='learnsummary') return LearnSummary(cur.data);
   if(cur.name==='summary') return Summary(cur.data);
   if(cur.name==='words') return Words(cur.deckId);
+  if(cur.name==='addwords') return AddWords(cur.deckId);
   if(cur.name==='settings') return Settings();
   Home();
 }
@@ -905,7 +932,7 @@ function openDeckSheet(deckId){
     const a=b.dataset.a; if(!a) return; closeSheet();
     if(a==='learn') go({name:'learn',deckId});
     else if(a==='repeat') go({name:'study',deckId,scope:'repeat',exmode:studyMode});
-    else if(a==='words') go({name:'words',deckId});
+    else if(a==='words'){ wordsEdit=false; go({name:'words',deckId}); }
     else if(a==='del'){
       if(confirm(`Удалить «${d.name}»? Это действие нельзя отменить.`)){
         STATE.deleted[deckId]=nowMs();                               // надгробие — чтобы не вернулась при синхронизации
@@ -1377,11 +1404,25 @@ function Summary(data){
 }
 
 /* ---------- WORDS list ---------- */
+let wordsEdit=false;
+function deleteCard(deckId, cardId){
+  const d=STATE.decks.find(x=>x.id===deckId); if(!d) return;
+  d.cards=d.cards.filter(c=>c.id!==cardId);
+  STATE.delCards[cardId]=nowMs();          // надгробие — чтобы не вернулась при синхронизации
+  d.updatedAt=nowMs();
+  persist(); haptic('medium');
+}
 function Words(deckId){
   const d=STATE.decks.find(x=>x.id===deckId);
   if(!d){ nav=[{name:'home'}]; return render(); }
   topC.innerHTML=`<div class="screen-title">${esc(d.name)}</div>`;
-  root.innerHTML=`<div class="wlist">${d.cards.map(c=>{
+  const n=d.cards.length;
+  const tools=`<div class="wl-tools">
+      <span class="wl-count">${n} ${plural(n,'слово','слова','слов')}</span>
+      ${n?`<button class="wl-edit${wordsEdit?' on':''}" id="wlEdit">${wordsEdit?'Готово':'Изменить'}</button>`:''}
+    </div>`;
+  const addBtn=`<button class="wl-add" id="wlAdd"><span class="ic">＋</span>Добавить слова</button>`;
+  const list = n ? `<div class="wlist${wordsEdit?' editing':''}">${d.cards.map(c=>{
     const parts=c.parts&&c.parts.length?c.parts:pinyinParts(c.hanzi,c.pinyin);
     const box=(c.box||1);
     const lbl = box>=5?'выучено':(box>=3?'изучается':'новое');
@@ -1391,10 +1432,72 @@ function Words(deckId){
         <div class="py">${renderPinyin(parts)}</div>
         <div class="tr">${esc(c.translation)}</div>
       </div>
-      <div class="box">${lbl}</div>
-    </div>`;}).join('')}</div>
-    <div class="fabwrap"><button class="cta" id="studyAll">Учить эти слова</button></div>`;
-  $('studyAll').onclick=()=>{ nav=nav.filter(n=>n.name!=='words'); go({name:'study',deckId,scope:'all',exmode:studyMode}); };
+      <div class="wend">
+        <span class="box">${lbl}</span>
+        <button class="wdel" data-id="${c.id}" aria-label="Удалить">✕</button>
+      </div>
+    </div>`;}).join('')}</div>`
+    : `<div class="wl-empty">Список пуст. Добавьте новые слова кнопкой выше.</div>`;
+  root.innerHTML = tools + addBtn + list +
+    (n && !wordsEdit ? `<div class="fabwrap"><button class="cta" id="studyAll">Учить эти слова</button></div>` : '');
+  $('wlAdd').onclick=()=>go({name:'addwords',deckId});
+  const ed=$('wlEdit'); if(ed) ed.onclick=()=>{ wordsEdit=!wordsEdit; haptic('sel'); render(); };
+  root.querySelectorAll('.wdel').forEach(b=>b.onclick=()=>{ deleteCard(deckId,b.dataset.id); render(); });
+  const sa=$('studyAll'); if(sa) sa.onclick=()=>{ nav=nav.filter(n=>n.name!=='words'); go({name:'study',deckId,scope:'all',exmode:studyMode}); };
+}
+
+/* добавление слов в существующий список */
+function AddWords(deckId){
+  const d=STATE.decks.find(x=>x.id===deckId);
+  if(!d){ nav=[{name:'home'}]; return render(); }
+  topC.innerHTML=`<div class="screen-title">Добавить слова</div>`;
+  root.innerHTML=`
+    <div class="field">
+      <label for="atext">Новые слова — по одному в строке</label>
+      <textarea id="atext" placeholder="你好 — привет&#10;谢谢 — спасибо&#10;学习 xué xí — учиться"></textarea>
+      <div class="hint">Понимает тире, скобки, табы и нумерацию. Пиньинь можно не писать — подберётся сам. Слова, которые уже есть в списке, добавлены не будут.</div>
+    </div>
+    <div id="aprev"></div>
+    <div class="fabwrap"><button class="cta" id="addBtn" disabled>Добавить</button></div>`;
+  const ta=$('atext'), prev=$('aprev'), btn=$('addBtn');
+  const keyOf=c=>c.hanzi+'\u0001'+(c.translation||'');
+  let t=null;
+  const refresh=()=>{
+    const parsed=parseList(ta.value);
+    const exist=new Set(d.cards.map(keyOf));
+    const fresh=parsed.filter(c=>!exist.has(keyOf(c)));
+    if(!parsed.length){ prev.innerHTML=''; btn.disabled=true; btn.textContent='Добавить'; return; }
+    btn.disabled = fresh.length===0;
+    btn.textContent = fresh.length
+      ? `Добавить ${fresh.length} ${plural(fresh.length,'карточку','карточки','карточек')}`
+      : 'Все слова уже в списке';
+    const dups=parsed.length-fresh.length;
+    prev.innerHTML=`
+      <div class="preview-head">
+        <span class="n">Распознано: ${parsed.length} ${plural(parsed.length,'карточка','карточки','карточек')}${dups>0?` · ${dups} уже в списке`:''}</span>
+      </div>
+      <div class="plist">${parsed.map(c=>{ const dup=exist.has(keyOf(c)); return `
+        <div class="prow ${c.provided?'':'auto'}${dup?' dup':''}">
+          <div class="hz">${esc(c.hanzi)}</div>
+          <div class="py">${renderPinyin(c.parts)}</div>
+          <div class="tr">${dup?'<span style="color:var(--faint)">уже в списке</span>':(esc(c.translation)||'<span style="color:var(--faint)">— нет перевода —</span>')}</div>
+        </div>`;}).join('')}</div>`;
+  };
+  ta.oninput=()=>{ clearTimeout(t); t=setTimeout(refresh,180); };
+  btn.onclick=()=>{
+    const exist=new Set(d.cards.map(keyOf));
+    const fresh=parseList(ta.value).filter(c=>!exist.has(keyOf(c)));
+    if(!fresh.length) return;
+    const ts=nowMs();
+    for(const c of fresh){
+      d.cards.push({ id:uid(), hanzi:c.hanzi, pinyin:c.pinyin, parts:c.parts,
+        translation:c.translation, provided:c.provided, box:1, due:ts, learned:0,
+        introduced:false, hard:false, hardStreak:0, ts });
+    }
+    d.updatedAt=ts; persist(); notify('success');
+    wordsEdit=false; nav.pop(); render();
+  };
+  setTimeout(()=>ta.focus(),60);
 }
 
 /* ---------- SETTINGS / КАБИНЕТ ---------- */
