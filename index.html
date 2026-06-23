@@ -103,6 +103,13 @@ input,textarea{font-family:inherit;color:inherit}
   background:var(--surface-3);color:var(--muted);white-space:nowrap}
 .review-all .chip.due{background:color-mix(in srgb,var(--t1) 16%,transparent);color:var(--t1)}
 .review-all .chip.done{background:color-mix(in srgb,var(--t2) 16%,transparent);color:var(--t2)}
+.review-all.hard::before{background:linear-gradient(var(--t1),var(--t4))}
+.chip.hardchip{background:color-mix(in srgb,var(--t1) 18%,transparent);color:var(--t1)}
+.deck .chip.hardchip{margin-left:auto}
+.dunno{display:block;width:100%;margin-top:14px;padding:13px;border-radius:14px;background:transparent;
+  border:1px solid var(--hairline);color:var(--muted);font-weight:600;font-size:15px;transition:opacity .15s,transform .1s}
+.dunno:active{transform:scale(.98)}
+.dunno:disabled{opacity:.35;pointer-events:none}
 .deck{display:block;width:100%;text-align:left;background:var(--surface);
   border:1px solid var(--hairline);border-radius:var(--radius);padding:16px 18px;
   margin-bottom:12px;box-shadow:var(--shadow);transition:transform .12s ease, box-shadow .12s}
@@ -353,60 +360,106 @@ const SETTINGS_DEFAULT={ reminders:false, reminderTime:'19:00', learnBatch:10, p
 let _mem=null;
 const uid=()=>Math.random().toString(36).slice(2,10);
 
-function blankState(){ return { v:2, decks:[], settings:Object.assign({},SETTINGS_DEFAULT), updatedAt:0 }; }
+function blankState(){ return { v:3, decks:[], settings:Object.assign({},SETTINGS_DEFAULT), deleted:{}, updatedAt:0 }; }
 function normalize(s){
   s=s||blankState();
   if(!Array.isArray(s.decks)) s.decks=[];
+  if(!s.deleted||typeof s.deleted!=='object') s.deleted={};
   s.settings=Object.assign({},SETTINGS_DEFAULT,s.settings||{});
   for(const d of s.decks){ if(!Array.isArray(d.cards)) d.cards=[];
+    d.updatedAt=d.updatedAt||d.createdAt||0;
     for(const c of d.cards){ c.box=c.box||1; c.due=c.due||0; c.learned=c.learned||0;
-      c.introduced=!!c.introduced; c.provided=!!c.provided; } }
+      c.introduced=!!c.introduced; c.provided=!!c.provided; c.hard=!!c.hard;
+      c.hardStreak=c.hardStreak||0; c.ts=c.ts||d.createdAt||0; } }
   return s;
 }
 // компактная сериализация (parts не храним — пересчитываются из иероглифов)
 function serialize(s){
-  return { v:2, updatedAt:s.updatedAt||nowMs(), settings:s.settings,
-    decks:s.decks.map(d=>({ id:d.id, name:d.name, createdAt:d.createdAt,
+  return { v:3, updatedAt:s.updatedAt||nowMs(), settings:s.settings, deleted:s.deleted||{},
+    decks:s.decks.map(d=>({ id:d.id, name:d.name, createdAt:d.createdAt, updatedAt:d.updatedAt||d.createdAt||0,
       cards:d.cards.map(c=>({ id:c.id, hanzi:c.hanzi, pinyin:c.pinyin, translation:c.translation,
-        provided:c.provided?1:0, box:c.box||1, due:c.due||0, learned:c.learned||0, introduced:c.introduced?1:0 })) })) };
+        provided:c.provided?1:0, box:c.box||1, due:c.due||0, learned:c.learned||0,
+        introduced:c.introduced?1:0, hard:c.hard?1:0, hardStreak:c.hardStreak||0, ts:c.ts||0 })) })) };
 }
-// --- local (sync) ---
-function loadLocal(){ try{ const r=localStorage.getItem(KEY); if(r) return JSON.parse(r); }catch(e){} return _mem; }
+// Слияние двух состояний без потери карточек: объединяем колоды и карточки по id,
+// для совпадающих карточек берём более свежую (по ts). Удаления — через «надгробия» (deleted).
+function mergeStates(a, b){
+  a=normalize(a); b=normalize(b);
+  const deleted=Object.assign({}, a.deleted, b.deleted);
+  for(const k in a.deleted) if((b.deleted[k]||0)>(a.deleted[k]||0)) deleted[k]=b.deleted[k];
+  const ids=new Set([...a.decks,...b.decks].map(d=>d.id));
+  const out=[];
+  for(const id of ids){
+    const da=a.decks.find(d=>d.id===id), db=b.decks.find(d=>d.id===id);
+    const base=(!da)?db:(!db)?da:((db.updatedAt||0)>(da.updatedAt||0)?db:da);
+    const delTs=deleted[id]||0;
+    if(delTs && delTs>=(base.updatedAt||0)) continue;           // удалена и не редактировалась позже
+    const byId={}, order=[];
+    const take=d=>{ if(!d) return; for(const c of d.cards){
+      if(!byId[c.id]){ byId[c.id]=c; order.push(c.id); }
+      else if((c.ts||0)>(byId[c.id].ts||0)) byId[c.id]=c; } };
+    take(base); take(da===base?db:da);                          // порядок ведущей колоды, затем добор
+    out.push({ id, name:base.name, createdAt:base.createdAt,
+      updatedAt:Math.max(da?da.updatedAt||0:0, db?db.updatedAt||0:0),
+      cards:order.map(cid=>byId[cid]) });
+  }
+  const newer = (b.updatedAt||0)>=(a.updatedAt||0) ? b : a;
+  return normalize({ v:3, decks:out, deleted, settings:newer.settings, updatedAt:Math.max(a.updatedAt||0,b.updatedAt||0) });
+}
+// --- local (sync) с переносом данных из прежних версий ---
+const OLD_KEYS=['hanzi_cards_v1'];
+function loadLocal(){
+  for(const k of [KEY, ...OLD_KEYS]){
+    try{ const r=localStorage.getItem(k); if(r) return JSON.parse(r); }catch(e){}
+  }
+  return _mem;
+}
 function saveLocal(s){ _mem=s; try{ localStorage.setItem(KEY, JSON.stringify(serialize(s))); }catch(e){} }
 
 // --- Telegram CloudStorage (async, разбивка по кускам ≤4096) ---
 const tgCloud = (TG && TG.CloudStorage && TG.isVersionAtLeast && TG.isVersionAtLeast('6.9')) ? TG.CloudStorage : null;
 const CK_IDX='hc_idx', CK=(i)=>'hc_'+i, CHUNK=3800;
-const cloudGet=keys=>new Promise(r=>{ try{ tgCloud.getItems(keys,(e,v)=>r(e?null:v)); }catch(_){ r(null); } });
+const cloudGet=keys=>new Promise(r=>{ if(!keys.length) return r({}); try{ tgCloud.getItems(keys,(e,v)=>r(e?null:v)); }catch(_){ r(null); } });
 const cloudSet=(k,v)=>new Promise(r=>{ try{ tgCloud.setItem(k,v,(e,ok)=>r(!e&&ok)); }catch(_){ r(false); } });
 const cloudKeysAll=()=>new Promise(r=>{ try{ tgCloud.getKeys((e,k)=>r(e?[]:(k||[]))); }catch(_){ r([]); } });
-const cloudDel=keys=>new Promise(r=>{ try{ tgCloud.removeItems(keys,()=>r(true)); }catch(_){ r(false); } });
+const cloudDel=keys=>new Promise(r=>{ if(!keys.length) return r(true); try{ tgCloud.removeItems(keys,()=>r(true)); }catch(_){ r(false); } });
 async function cloudLoad(){
   if(!tgCloud) return null;
   const iw=await cloudGet([CK_IDX]); const idxRaw=iw&&iw[CK_IDX];
   if(!idxRaw) return null;
   let idx; try{ idx=JSON.parse(idxRaw); }catch(e){ return null; }
+  if(!idx.n) return null;
   const keys=[]; for(let i=0;i<idx.n;i++) keys.push(CK(i));
   const parts=await cloudGet(keys); if(!parts) return null;
   let str=''; for(let i=0;i<idx.n;i++) str+=(parts[CK(i)]||'');
   try{ const o=JSON.parse(str); o.updatedAt=idx.updatedAt||o.updatedAt||0; return o; }catch(e){ return null; }
 }
+let _saving=false, _saveAgain=false;
 async function cloudSave(s){
   if(!tgCloud) return false;
-  const str=JSON.stringify(serialize(s));
-  const chunks=[]; for(let i=0;i<str.length;i+=CHUNK) chunks.push(str.slice(i,i+CHUNK));
-  for(let i=0;i<chunks.length;i++){ if(!await cloudSet(CK(i),chunks[i])) return false; }
-  await cloudSet(CK_IDX, JSON.stringify({n:chunks.length, updatedAt:s.updatedAt||nowMs()}));
-  const existing=await cloudKeysAll();
-  const stale=existing.filter(k=>/^hc_\d+$/.test(k) && (+k.slice(3))>=chunks.length);
-  if(stale.length) await cloudDel(stale);
-  return true;
+  if(_saving){ _saveAgain=true; return true; }                  // не пишем параллельно
+  _saving=true;
+  try{
+    const str=JSON.stringify(serialize(s));
+    const chunks=[]; for(let i=0;i<str.length;i+=CHUNK) chunks.push(str.slice(i,i+CHUNK));
+    for(let i=0;i<chunks.length;i++){ if(!await cloudSet(CK(i),chunks[i])) return false; }
+    await cloudSet(CK_IDX, JSON.stringify({n:chunks.length, updatedAt:s.updatedAt||nowMs()}));
+    const existing=await cloudKeysAll();
+    const stale=existing.filter(k=>/^hc_\d+$/.test(k) && (+k.slice(3))>=chunks.length);
+    await cloudDel(stale);
+    return true;
+  } finally {
+    _saving=false;
+    if(_saveAgain){ _saveAgain=false; cloudSave(STATE); }
+  }
 }
 
 let STATE = normalize(loadLocal() || blankState());
 let _cloudTimer=null, syncState = tgCloud?'pending':'local';
+function bumpDeckTimes(){ for(const d of STATE.decks){ let mx=d.updatedAt||d.createdAt||0;
+  for(const c of d.cards) if((c.ts||0)>mx) mx=c.ts; d.updatedAt=mx; } }
 function persist(){
-  STATE.updatedAt=nowMs();
+  STATE.updatedAt=nowMs(); bumpDeckTimes();
   saveLocal(STATE);
   if(tgCloud){ clearTimeout(_cloudTimer); _cloudTimer=setTimeout(async()=>{
     syncState='saving'; updateSyncUI();
@@ -415,13 +468,31 @@ function persist(){
 }
 async function bootSync(){
   if(!tgCloud){ syncState='local'; return; }
-  const cloud=await cloudLoad();
-  if(cloud){
-    if((cloud.updatedAt||0)>=(STATE.updatedAt||0) || !STATE.decks.length){
-      STATE=normalize(cloud); syncState='synced'; render(); maybeRemind();
-    } else { cloudSave(STATE); syncState='synced'; }
-  } else { if(STATE.decks.length) await cloudSave(STATE); syncState='synced'; }
+  try{
+    const cloud=await cloudLoad();
+    if(cloud){
+      const before=JSON.stringify(serialize(STATE));
+      STATE=mergeStates(STATE, cloud);            // объединяем — карточки не теряются
+      syncState='synced';
+      render(); maybeRemind();
+      if(JSON.stringify(serialize(STATE))!==before || (cloud.updatedAt||0)!==(STATE.updatedAt||0)){
+        STATE.updatedAt=nowMs(); saveLocal(STATE); await cloudSave(STATE);   // сводим оба устройства к объединению
+      }
+    } else {
+      if(STATE.decks.length) await cloudSave(STATE);
+      syncState='synced';
+    }
+  }catch(e){ syncState='error'; }
   updateSyncUI();
+}
+// принудительно подтянуть свежие данные из облака (кнопка в настройках)
+async function pullFromCloud(){
+  if(!tgCloud){ alert('Синхронизация доступна только внутри Telegram.'); return; }
+  syncState='pending'; updateSyncUI();
+  const cloud=await cloudLoad();
+  if(cloud){ STATE=mergeStates(STATE, cloud); saveLocal(STATE); }
+  syncState='synced'; updateSyncUI(); render();
+  notify('success');
 }
 function updateSyncUI(){ const el=$('syncStatus'); if(el) el.textContent=syncLabel(); }
 function syncLabel(){
@@ -509,8 +580,19 @@ const DAY=86400000;
 const INTERVAL=[0,1,2,4,8,16]; // by box 1..5 (index)
 function nowMs(){ return Date.now(); }
 function schedule(card, ok){
-  if(ok){ card.box=Math.min(5,(card.box||1)+1); card.due=nowMs()+INTERVAL[card.box]*DAY; card.learned=(card.learned||0)+1; }
-  else  { card.box=1; card.due=nowMs()+10*60*1000; }
+  card.ts=nowMs();
+  if(ok){
+    if(card.hard){
+      card.hardStreak=(card.hardStreak||0)+1;
+      if(card.hardStreak>=2){ card.hard=false; card.hardStreak=0; }   // 2 верных подряд — выходит из трудных
+    }
+    card.box=Math.min(5,(card.box||1)+1);
+    card.due=nowMs()+(card.hard ? 30*60*1000 : INTERVAL[card.box]*DAY); // трудные возвращаются чаще
+    card.learned=(card.learned||0)+1;
+  } else {
+    card.hard=true; card.hardStreak=0;                                 // «не знаю» / ошибка → в трудные
+    card.box=1; card.due=nowMs()+10*60*1000;
+  }
 }
 function deckStats(d){
   const total=d.cards.length;
@@ -519,7 +601,8 @@ function deckStats(d){
   const due=d.cards.filter(c=>isStudied(c)&&(c.due||0)<=nowMs()).length;
   const mastered=d.cards.filter(c=>(c.box||1)>=5).length;
   const studied=d.cards.filter(isStudied).length;
-  return {total, fresh, learning, due, mastered, studied};
+  const hard=d.cards.filter(c=>c.hard).length;
+  return {total, fresh, learning, due, mastered, studied, hard};
 }
 // «изученное» = слово уже проходили (через «Учить» или верно отвечали раньше)
 function isStudied(c){ return !!c.introduced || (c.box||1)>1 || (c.learned||0)>0; }
@@ -581,13 +664,22 @@ function Home(){
         </div>
         <span class="chip ${dueAll?'due':'done'}">${dueAll?dueAll+' к повтору':'✓ всё в срок'}</span>
       </button>` : '';
+    const hard=hardCards();
+    const hardBanner = hard.length ? `<button class="review-all hard" id="hardBtn">
+        <div class="ra-l">
+          <div class="ra-t">Трудные слова</div>
+          <div class="ra-s">${hard.length} ${plural(hard.length,'слово','слова','слов')} на частое повторение</div>
+        </div>
+        <span class="chip hardchip">${hard.length}</span>
+      </button>` : '';
     const cards=STATE.decks.map(d=>{
       const s=deckStats(d);
       const pct=s.total?Math.round(s.studied/s.total*100):0;
       let chip = s.fresh>0
         ? `<span class="chip new">${s.fresh} ${plural(s.fresh,'новое','новых','новых')}</span>`
+        : (s.hard>0 ? `<span class="chip hardchip">${s.hard} трудных</span>`
         : (s.due>0 ? `<span class="chip due">${s.due} к повтору</span>`
-        : (s.mastered===s.total ? `<span class="chip done">✓ выучено</span>` : `<span class="chip">${pct}%</span>`));
+        : (s.mastered===s.total ? `<span class="chip done">✓ выучено</span>` : `<span class="chip">${pct}%</span>`)));
       return `<button class="deck" data-deck="${d.id}">
         <div class="row">
           <div>
@@ -599,9 +691,10 @@ function Home(){
         <div class="bar"><i style="width:${pct}%"></i></div>
       </button>`;
     }).join('');
-    root.innerHTML = banner + cards + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
+    root.innerHTML = banner + hardBanner + cards + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
     root.querySelectorAll('.deck').forEach(el=>el.onclick=()=>openDeckSheet(el.dataset.deck));
     const ra=$('reviewAll'); if(ra) ra.onclick=openReviewSheet;
+    const hb=$('hardBtn'); if(hb) hb.onclick=()=>{ haptic('light'); go({name:'study',deckId:'__hard__',scope:'all',exmode:studyMode}); };
   }
   $('newBtn').onclick=()=>go({name:'import'});
 }
@@ -643,9 +736,11 @@ function Import(){
   btn.onclick=()=>{
     if(!importParsed.length) return;
     const name=(nm.value.trim())|| ('Урок '+(STATE.decks.length+1));
-    const deck={ id:uid(), name, createdAt:nowMs(),
+    const t=nowMs();
+    const deck={ id:uid(), name, createdAt:t, updatedAt:t,
       cards: importParsed.map(c=>({ id:uid(), hanzi:c.hanzi, pinyin:c.pinyin, parts:c.parts,
-        translation:c.translation, box:1, due:nowMs(), learned:0 })) };
+        translation:c.translation, provided:c.provided, box:1, due:t, learned:0,
+        introduced:false, hard:false, hardStreak:0, ts:t })) };
     STATE.decks.unshift(deck); persist(); notify('success');
     nav=[{name:'home'}]; render();
   };
@@ -685,6 +780,7 @@ function openDeckSheet(deckId){
     else if(a==='words') go({name:'words',deckId});
     else if(a==='del'){
       if(confirm(`Удалить «${d.name}»? Это действие нельзя отменить.`)){
+        STATE.deleted[deckId]=nowMs();                               // надгробие — чтобы не вернулась при синхронизации
         STATE.decks=STATE.decks.filter(x=>x.id!==deckId); persist(); notify('warning'); render();
       }
     }
@@ -728,6 +824,7 @@ let studyMode='mixed';
 const cardParts=c=>(c.parts&&c.parts.length)?c.parts:pinyinParts(c.hanzi,c.pinyin);
 const chars=s=>Array.from(s);              // unicode-safe split
 function allCards(){ const a=[]; for(const d of STATE.decks) for(const c of d.cards) a.push(c); return a; }
+function hardCards(){ return allCards().filter(c=>c.hard); }
 
 function Study(deckId, scope, exmode){
   let d;
@@ -735,12 +832,17 @@ function Study(deckId, scope, exmode){
     const cards=allCards().filter(isStudied);
     if(!cards.length){ nav=[{name:'home'}]; return render(); }
     d={ id:'__all__', name:'Повторение всех слов', cards };
+  } else if(deckId==='__hard__'){
+    const cards=hardCards();
+    if(!cards.length){ nav=[{name:'home'}]; return render(); }
+    d={ id:'__hard__', name:'Трудные слова', cards };
   } else {
     d=STATE.decks.find(x=>x.id===deckId);
     if(!d){ nav=[{name:'home'}]; return render(); }
   }
   topC.innerHTML=`<div class="screen-title">${esc(d.name)}</div>`;
-  let pool = scope==='repeat' ? d.cards.filter(isStudied)
+  let pool = deckId==='__hard__' ? d.cards.slice()
+           : scope==='repeat' ? d.cards.filter(isStudied)
            : scope==='all'    ? d.cards.slice()
            : d.cards.filter(c=>isStudied(c)&&(c.due||0)<=nowMs());
   if(!pool.length) pool=d.cards.filter(isStudied);
@@ -940,18 +1042,30 @@ function exChoice(card){
       : `<span class="o-ru">${esc(o.translation)||'—'}</span>`;
     return `<button class="opt" data-id="${o.id}">${inner}</button>`;
   }).join('');
-  studyShell(`${prompt}<div class="options ${ru2cn?'cols2':'col1'}">${optHtml}</div>`);
+  studyShell(`${prompt}<div class="options ${ru2cn?'cols2':'col1'}">${optHtml}</div>
+    <button class="dunno" id="dunnoBtn">Не знаю</button>`);
+  const revealChoice=()=>{
+    const correctBtn = root.querySelector(`.opt[data-id="${card.id}"]`);
+    if(correctBtn) correctBtn.classList.add('correct');
+    if(ru2cn) root.querySelectorAll('.opt.correct .o-py,.opt.wrong .o-py').forEach(p=>p.classList.remove('hide'));
+  };
   root.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
     if(s.locked) return; s.locked=true;
     const ok = b.dataset.id===card.id;
-    const correctBtn = root.querySelector(`.opt[data-id="${card.id}"]`);
     root.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    const dn=$('dunnoBtn'); if(dn) dn.disabled=true;
     if(ok){ b.classList.add('correct'); notify('success'); }
-    else { b.classList.add('wrong'); if(correctBtn) correctBtn.classList.add('correct'); haptic('medium'); }
-    // в направлении рус→кит пиньинь скрыт как подсказка — показываем после ответа
-    if(ru2cn) root.querySelectorAll('.opt.correct .o-py,.opt.wrong .o-py').forEach(p=>p.classList.remove('hide'));
+    else { b.classList.add('wrong'); haptic('medium'); }
+    revealChoice();                                   // всегда показываем верный ответ
     resolve(ok);
   });
+  $('dunnoBtn').onclick=()=>{
+    if(s.locked) return; s.locked=true;
+    root.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    $('dunnoBtn').disabled=true;
+    revealChoice();                                   // показываем верный ответ
+    haptic('medium'); resolve(false);                 // → в трудные слова
+  };
 }
 
 /* --- 3) BUILD: assemble hanzi in order --- */
@@ -970,8 +1084,15 @@ function exBuild(card){
     </div>
     <div class="q-label">Соберите слово</div>
     <div class="slots" id="slots"></div>
-    <div class="bank" id="bank"></div>`);
+    <div class="bank" id="bank"></div>
+    <button class="dunno" id="dunnoBtn">Не знаю</button>`);
   const slotsEl=$('slots'), bankEl=$('bank');
+  function revealAnswer(){
+    const pr=root.querySelector('.q-prompt.build');
+    if(pr && !pr.querySelector('.py-hint')) pr.insertAdjacentHTML('beforeend', `<div class="py-hint">${renderPinyin(cardParts(card))}</div>`);
+    slotsEl.classList.add('shake');
+    setTimeout(()=>{ slotsEl.innerHTML = target.map(ch=>`<button class="slot filled ok">${esc(ch)}</button>`).join(''); }, 220);
+  }
   function paint(){
     slotsEl.innerHTML = target.map((_,i)=>{
       const it=picked[i];
@@ -994,7 +1115,7 @@ function exBuild(card){
     });
   }
   function check(){
-    s.locked=true;
+    s.locked=true; const dn=$('dunnoBtn'); if(dn) dn.disabled=true;
     const ok = picked.map(p=>p.ch).join('')===card.hanzi;
     slotsEl.querySelectorAll('.slot.filled').forEach(b=>b.classList.add(ok?'ok':'bad'));
     const pr=root.querySelector('.q-prompt.build');                 // показываем пиньинь уже после ответа
@@ -1002,13 +1123,16 @@ function exBuild(card){
     if(ok){ notify('success'); resolve(true); }
     else {
       haptic('medium'); slotsEl.classList.add('shake');
-      // reveal correct order
-      setTimeout(()=>{
+      setTimeout(()=>{                                               // показываем верный порядок
         slotsEl.innerHTML = target.map(ch=>`<button class="slot filled ok">${esc(ch)}</button>`).join('');
       }, 360);
       resolve(false);
     }
   }
+  $('dunnoBtn').onclick=()=>{
+    if(s.locked) return; s.locked=true; $('dunnoBtn').disabled=true;
+    revealAnswer(); haptic('medium'); resolve(false);               // верный ответ + в трудные слова
+  };
   paint();
 }
 
@@ -1107,7 +1231,8 @@ function Settings(){
 
     <div class="set-group">Данные</div>
     <div class="set-card">
-      <button class="set-line" id="exportBtn"><span class="ic">↧</span><span>Экспорт (резервная копия)</span></button>
+      ${tgCloud?`<button class="set-line" id="pullBtn"><span class="ic">⟳</span><span>Обновить с других устройств</span></button>`:''}
+      <button class="set-line ${tgCloud?'sep':''}" id="exportBtn"><span class="ic">↧</span><span>Экспорт (резервная копия)</span></button>
       <button class="set-line sep" id="importBtn"><span class="ic">↥</span><span>Импорт из копии</span></button>
     </div>
     <p class="set-foot">汉字 · Карточки — словарь пиньиня встроен, работает офлайн.</p>`;
@@ -1120,6 +1245,7 @@ function Settings(){
   $('pyFront').onchange=e=>{ st.pinyinFront=e.target.checked; persist(); haptic('sel'); };
   $('exportBtn').onclick=exportData;
   $('importBtn').onclick=importData;
+  const pb=$('pullBtn'); if(pb) pb.onclick=pullFromCloud;
 }
 function exportData(){
   const blob=new Blob([JSON.stringify(serialize(STATE),null,2)],{type:'application/json'});
