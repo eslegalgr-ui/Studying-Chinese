@@ -29,8 +29,8 @@
     --t1:#ff6b6b; --t2:#4cc97a; --t3:#5b9bf0; --t4:#b07ce6; --t5:#9a9aa6;
   }
 }
-/* Telegram theme overrides (native feel inside TG) */
-body.tg{ --bg:var(--tg-bg,var(--bg)); --surface:var(--tg-surface,var(--surface)); }
+/* Telegram theme is applied via JS (applyTgTheme) by setting variables directly,
+   so no self-referencing CSS var fallbacks here (those create cycles → transparent). */
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%}
@@ -420,13 +420,31 @@ function applyTgTheme(){
   document.body.classList.add('tg');
   const p = TG.themeParams||{};
   const r = document.documentElement.style;
-  if(p.bg_color) r.setProperty('--tg-bg', p.bg_color);
-  if(p.secondary_bg_color) r.setProperty('--tg-surface', p.secondary_bg_color);
-  if(p.text_color) r.setProperty('--text', p.text_color);
-  if(p.hint_color) r.setProperty('--muted', p.hint_color);
-  if(p.section_separator_color) r.setProperty('--hairline', p.section_separator_color);
-  if(p.button_color){ r.setProperty('--cta', p.button_color); }
-  if(p.button_text_color){ r.setProperty('--cta-text', p.button_text_color); }
+  const norm=h=>{ if(!h||typeof h!=='string') return null; h=h.trim(); return /^#?[0-9a-fA-F]{3,6}$/.test(h)?(h[0]==='#'?h:'#'+h):null; };
+  const hex2rgb=h=>{ h=h.replace('#',''); if(h.length===3) h=h.split('').map(x=>x+x).join(''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; };
+  const rgb2hex=a=>'#'+a.map(x=>Math.max(0,Math.min(255,Math.round(x))).toString(16).padStart(2,'0')).join('');
+  const lum=h=>{ const[r,g,b]=hex2rgb(h); return (0.299*r+0.587*g+0.114*b)/255; };
+  const mix=(h,target,t)=>{ const a=hex2rgb(h); return rgb2hex(a.map(v=>v+(target-v)*t)); };
+
+  const bg=norm(p.bg_color), sec=norm(p.secondary_bg_color);
+  if(bg){
+    const dark = lum(bg)<0.5;
+    const toward = dark?255:0;                 // светлые поверхности на тёмном фоне и наоборот
+    const surface = sec || mix(bg, toward, dark?0.06:0.02);
+    r.setProperty('--bg', bg);
+    r.setProperty('--surface', surface);
+    r.setProperty('--surface-2', mix(surface, toward, dark?0.05:0.02));
+    r.setProperty('--surface-3', mix(surface, toward, dark?0.10:0.05));
+    r.setProperty('--hairline', mix(surface, toward, dark?0.16:0.10));
+    r.setProperty('--faint', mix(surface, dark?255:0, dark?0.45:0.55));
+  }
+  if(norm(p.text_color)) r.setProperty('--text', norm(p.text_color));
+  else if(bg) r.setProperty('--text', lum(bg)<0.5?'#f1f1f4':'#1a1a20');
+  if(norm(p.hint_color)) r.setProperty('--muted', norm(p.hint_color));
+  else if(bg) r.setProperty('--muted', lum(bg)<0.5?'#9a9aa6':'#86858f');
+  if(norm(p.section_separator_color)) r.setProperty('--hairline', norm(p.section_separator_color));
+  if(norm(p.button_color)) r.setProperty('--cta', norm(p.button_color));
+  if(norm(p.button_text_color)) r.setProperty('--cta-text', norm(p.button_text_color));
 }
 if(TG){ try{ TG.ready(); TG.expand(); applyTgTheme(); TG.onEvent('themeChanged',applyTgTheme);
   if(TG.setHeaderColor) try{TG.setHeaderColor('bg_color')}catch(e){} }catch(e){} }
