@@ -92,6 +92,36 @@ input,textarea{font-family:inherit;color:inherit}
 
 /* ============ HOME ============ */
 .lead{color:var(--muted);font-size:14.5px;margin:-6px 0 20px}
+
+/* greeting + motivation hero */
+.hero{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--hairline);
+  border-radius:var(--radius);padding:18px 18px 15px;margin-bottom:24px;box-shadow:var(--shadow)}
+.hero::before{content:"";position:absolute;inset:0;opacity:.12;pointer-events:none;
+  background:radial-gradient(115% 95% at 100% 0,var(--t4),transparent 60%),
+             radial-gradient(120% 120% at 0 100%,var(--t3),transparent 55%)}
+.hero-greet{position:relative;font-size:19px;font-weight:720;letter-spacing:-.01em}
+.hero-msg{position:relative;color:var(--muted);font-size:14px;margin-top:5px;line-height:1.5}
+.hero-goal{position:relative;margin-top:15px}
+.hg-top{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.hg-top b{color:var(--text);font-variant-numeric:tabular-nums;font-weight:720}
+.hg-bar{height:8px;border-radius:999px;background:var(--surface-3);overflow:hidden}
+.hg-bar > i{display:block;height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--t3),var(--t2));transition:width .55s cubic-bezier(.2,.8,.2,1)}
+.hero-goal.done .hg-top b{color:var(--t2)}
+.hero-goal.done .hg-bar > i{background:var(--t2)}
+.hero-stats{position:relative;display:flex;gap:9px;margin-top:16px}
+.hs{flex:1;background:var(--surface-2);border:1px solid var(--hairline);border-radius:14px;
+  padding:10px 6px;text-align:center;display:flex;flex-direction:column;gap:1px}
+.hs b{font-size:18px;font-weight:720;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.hs span{font-size:11px;color:var(--muted);font-weight:600}
+.hs.fire b{color:var(--t1)}
+
+/* section labels that separate review blocks from the user's own lists */
+.home-sec{display:flex;align-items:center;gap:8px;margin:2px 4px 11px;
+  font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.home-sec .n{margin-left:auto;color:var(--faint);font-weight:600;letter-spacing:.02em;font-size:12px}
+.home-group{margin-bottom:22px}
+.home-group:last-of-type{margin-bottom:0}
 .review-all{display:flex;align-items:center;gap:12px;width:100%;text-align:left;position:relative;overflow:hidden;
   background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);
   padding:16px 18px 16px 22px;margin-bottom:18px;box-shadow:var(--shadow);transition:transform .12s}
@@ -210,6 +240,16 @@ input,textarea{font-family:inherit;color:inherit}
 .cont-hint .ch-correct{font-size:13px;font-weight:680}
 .cont-hint .ch-tap{font-size:11px;font-weight:600;opacity:.72}
 
+/* «Продолжить» — переход только по нажатию (после «Не знаю») */
+.cont-btnbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;justify-content:center;
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--bg) 72%,transparent);
+  transform:translateY(18px);opacity:0;transition:opacity .2s ease,transform .2s ease;pointer-events:none}
+.cont-btnbar.on{opacity:1;transform:none;pointer-events:auto}
+.cont-btn{width:100%;max-width:380px;background:var(--cta);color:var(--cta-text);
+  font-weight:660;font-size:16px;padding:16px;border-radius:16px;letter-spacing:.01em;transition:transform .12s}
+.cont-btn:active{transform:scale(.98)}
+
 /* legend */
 .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:14px}
 .legend span{font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;font-weight:600}
@@ -238,6 +278,8 @@ input,textarea{font-family:inherit;color:inherit}
 .opt .o-hz{font-family:var(--han);font-size:24px;font-weight:500;line-height:1.1}
 .opt .o-py{font-size:13px;font-weight:600;display:flex;gap:.35em;flex-wrap:wrap;justify-content:center}
 .opt .o-py.hide{display:none}
+.opt.pyopt{min-height:58px}
+.opt.pyopt .o-py{font-size:18px}
 .opt .o-ru{font-size:16px;font-weight:560;text-align:center;line-height:1.3}
 .opt.correct{position:relative;border-color:var(--t2);background:var(--t2);
   box-shadow:0 6px 20px color-mix(in srgb,var(--t2) 40%,transparent)}
@@ -372,7 +414,7 @@ if(TG){ try{ TG.ready(); TG.expand(); applyTgTheme(); TG.onEvent('themeChanged',
    Внутри Telegram данные привязаны к аккаунту пользователя автоматически (отдельный «кабинет»
    у каждого) и доступны на всех его устройствах. Без Telegram — только локально в браузере. */
 const KEY='hanzi_cards_v2';
-const SETTINGS_DEFAULT={ reminders:false, reminderTime:'19:00', learnBatch:10, pinyinFront:true, lastReminded:null };
+const SETTINGS_DEFAULT={ reminders:false, reminderTime:'19:00', learnBatch:10, pinyinFront:true, lastReminded:null, streak:0, lastActiveDay:null, dailyGoal:20 };
 let _mem=null;
 const uid=()=>Math.random().toString(36).slice(2,10);
 
@@ -644,6 +686,8 @@ function go(screen){ nav.push(screen); haptic('light'); render(); }
    ================================================================= */
 function render(){
   closeSheet();
+  if(_pendingCleanup){ try{ _pendingCleanup(); }catch(e){} }
+  removeContinueButton(); hideContinueHint();
   const cur=nav[nav.length-1]||{name:'home'};
   setBack(nav.length>1);
   if(cur.name==='home') return Home();
@@ -658,6 +702,47 @@ function render(){
 }
 
 /* ---------- HOME ---------- */
+/* ---------- HOME ---------- */
+// Приветствие по времени суток + имя из Telegram (если доступно)
+function greeting(){
+  const u=tgUser(); const name=u&&u.first_name?String(u.first_name).trim():'';
+  const h=new Date().getHours();
+  const g = h<5?'Доброй ночи':h<12?'Доброе утро':h<18?'Добрый день':'Добрый вечер';
+  return name?`${g}, ${name}`:g;
+}
+// Мотивационная строка, подстраивается под состояние
+function motivationLine(x){
+  if(x.studied===0) return x.fresh>0
+    ? 'Начните с первого списка — пара минут, и первые слова ваши.'
+    : 'Добавьте список слов после урока, и начнём учить.';
+  if(x.goal>0 && x.goalDone>=x.goal) return 'Дневная цель выполнена — отличная работа! Можно продолжить или отдохнуть.';
+  if(x.goalDone>0 && x.goal>0) { const left=x.goal-x.goalDone; return `Ещё ${left} ${plural(left,'слово','слова','слов')} до дневной цели — почти у цели!`; }
+  if(x.dueAll>0) return `Сегодня к повторению ${x.dueAll} ${plural(x.dueAll,'слово','слова','слов')}. Закрепим, пока свежо в памяти.`;
+  if(x.fresh>0) return 'Все повторения в срок — можно выучить новые слова!';
+  if(x.streak>=3) return `${x.streak} ${plural(x.streak,'день','дня','дней')} подряд — отличная привычка. Так держать!`;
+  if(x.mastered>0) return `Уже выучено ${x.mastered} ${plural(x.mastered,'слово','слова','слов')}. Загляните позже для повторения.`;
+  return 'Всё в срок. Возвращайтесь, когда подойдёт время повторить.';
+}
+// Серия дней подряд: растёт при первом заходе за новый день
+function updateStreak(){
+  const st=STATE.settings;
+  const t=new Date(); const today=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate();
+  if(st.lastActiveDay===today) return st.streak||1;
+  const yd=new Date(Date.now()-86400000);
+  const yest=yd.getFullYear()+'-'+(yd.getMonth()+1)+'-'+yd.getDate();
+  st.streak = (st.lastActiveDay===yest) ? (st.streak||0)+1 : 1;
+  st.lastActiveDay=today; persist();
+  return st.streak;
+}
+// Дневная цель: сколько разных слов отработано сегодня
+function dailyGoal(){ return STATE.settings.dailyGoal||20; }
+function goalDoneToday(){ const st=STATE.settings; return (st.goalDay===todayStr()&&st.goalIds)?st.goalIds.length:0; }
+function bumpDailyGoal(cardId){
+  const st=STATE.settings; const today=todayStr();
+  if(st.goalDay!==today){ st.goalDay=today; st.goalIds=[]; }
+  if(!st.goalIds) st.goalIds=[];
+  if(st.goalIds.indexOf(cardId)===-1) st.goalIds.push(cardId);
+}
 function Home(){
   topC.innerHTML=`<div class="brand"><span class="mark">汉字</span><span class="name">Карточки</span></div>
     <button class="gear" id="gearBtn" aria-label="Настройки">⚙</button>`;
@@ -671,8 +756,31 @@ function Home(){
       </div>
       <div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
   } else {
-    const studied=allCards().filter(isStudied);
+    const all=allCards();
+    const studied=all.filter(isStudied);
     const dueAll=studied.filter(c=>(c.due||0)<=nowMs()).length;
+    const mastered=all.filter(c=>(c.box||1)>=5).length;
+    const fresh=all.filter(isNew).length;
+    const hard=hardCards();
+    const streak=updateStreak();
+    const goal=dailyGoal(), goalDone=goalDoneToday();
+    const goalPct=goal>0?Math.min(100,Math.round(goalDone/goal*100)):0;
+    const goalMet=goalDone>=goal;
+
+    const hero=`<div class="hero">
+        <div class="hero-greet">${esc(greeting())}</div>
+        <div class="hero-msg">${esc(motivationLine({studied:studied.length,dueAll,fresh,mastered,streak,goalDone,goal}))}</div>
+        <div class="hero-goal${goalMet?' done':''}">
+          <div class="hg-top"><span>Цель на сегодня</span><b>${goalMet?`${goalDone} / ${goal} ✓`:`${goalDone} / ${goal} слов`}</b></div>
+          <div class="hg-bar"><i style="width:${goalPct}%"></i></div>
+        </div>
+        <div class="hero-stats">
+          <div class="hs fire"><b>${streak>0?'🔥 ':''}${streak||0}</b><span>${plural(streak||0,'день подряд','дня подряд','дней подряд')}</span></div>
+          <div class="hs"><b>${mastered}</b><span>${plural(mastered,'слово выучено','слова выучено','слов выучено')}</span></div>
+          <div class="hs"><b>${dueAll}</b><span>к повтору</span></div>
+        </div>
+      </div>`;
+
     const banner = studied.length ? `<button class="review-all" id="reviewAll">
         <div class="ra-l">
           <div class="ra-t">Повторить всё</div>
@@ -680,7 +788,6 @@ function Home(){
         </div>
         <span class="chip ${dueAll?'due':'done'}">${dueAll?dueAll+' к повтору':'✓ всё в срок'}</span>
       </button>` : '';
-    const hard=hardCards();
     const hardBanner = hard.length ? `<button class="review-all hard" id="hardBtn">
         <div class="ra-l">
           <div class="ra-t">Трудные слова</div>
@@ -688,6 +795,9 @@ function Home(){
         </div>
         <span class="chip hardchip">${hard.length}</span>
       </button>` : '';
+    const reviewSection = (banner||hardBanner)
+      ? `<div class="home-group"><div class="home-sec">Повторение</div>${banner}${hardBanner}</div>` : '';
+
     const cards=STATE.decks.map(d=>{
       const s=deckStats(d);
       const pct=s.total?Math.round(s.studied/s.total*100):0;
@@ -707,7 +817,9 @@ function Home(){
         <div class="bar"><i style="width:${pct}%"></i></div>
       </button>`;
     }).join('');
-    root.innerHTML = banner + hardBanner + cards + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
+    const decksSection = `<div class="home-group"><div class="home-sec">Мои списки<span class="n">${STATE.decks.length}</span></div>${cards}</div>`;
+
+    root.innerHTML = hero + reviewSection + decksSection + `<div class="fabwrap"><button class="cta" id="newBtn">＋ Новый список</button></div>`;
     root.querySelectorAll('.deck').forEach(el=>el.onclick=()=>openDeckSheet(el.dataset.deck));
     const ra=$('reviewAll'); if(ra) ra.onclick=openReviewSheet;
     const hb=$('hardBtn'); if(hb) hb.onclick=()=>{ haptic('light'); go({name:'study',deckId:'__hard__',scope:'all',exmode:studyMode}); };
@@ -998,7 +1110,8 @@ function nextExercise(){
 }
 
 // resolve current card. learn: advance step; study: schedule + requeue on miss
-function resolve(ok){
+// manual=true → не переключаемся автоматически, ждём кнопку «Продолжить»
+function resolve(ok, manual){
   const s=session; if(s.resolving) return;
   const id=s.cur;
   const card=s.deck.cards.find(c=>c.id===id);
@@ -1006,6 +1119,7 @@ function resolve(ok){
   s.resolving=true; s.locked=true;
   schedule(card, ok);
   if(ok) s.learnedIds.add(id); else s.repeatedIds.add(id);
+  bumpDailyGoal(id);
   let advance;
   if(s.kind==='learn'){
     persist();
@@ -1018,14 +1132,18 @@ function resolve(ok){
   }
   if(ok){
     setTimeout(advance, 260);
+  } else if(manual){
+    // «Не знаю» → показываем правильный ответ и ждём явного нажатия «Продолжить»
+    showContinueButton(advance);
   } else {
-    // неверно → даём время изучить правильный ответ; можно нажать, чтобы продолжить раньше
+    // неверный выбор → даём время изучить правильный ответ; можно нажать, чтобы продолжить раньше
     showContinueHint();
     armContinue(advance, 4000);
   }
 }
 
 // Показать правильный ответ подольше: авто-переход через delay ИЛИ по нажатию.
+let _pendingCleanup=null;     // отменяет ожидающий авто-переход при уходе с экрана
 function armContinue(advance, delay){
   let done=false, guard=true;
   const fire=()=>{ if(done) return; done=true; cleanup(); advance(); };
@@ -1034,10 +1152,11 @@ function armContinue(advance, delay){
     clearTimeout(timer); clearTimeout(guardTimer);
     document.removeEventListener('click',onTap,true);
     document.removeEventListener('touchstart',onTap,true);
-    hideContinueHint();
+    hideContinueHint(); _pendingCleanup=null;
   }
   const guardTimer=setTimeout(()=>{ guard=false; }, 480); // не считать тот же тап, что дал ответ
   const timer=setTimeout(fire, delay);
+  _pendingCleanup=cleanup;
   document.addEventListener('click',onTap,true);
   document.addEventListener('touchstart',onTap,true);
 }
@@ -1050,6 +1169,20 @@ function showContinueHint(){
 function hideContinueHint(){
   const el=document.getElementById('contHint');
   if(el){ el.classList.remove('on'); setTimeout(()=>{ if(el&&el.parentNode) el.remove(); },220); }
+}
+// Кнопка «Продолжить» — переход только по нажатию (без авто-перехода).
+function showContinueButton(advance){
+  let el=document.getElementById('contBtnBar');
+  if(!el){ el=document.createElement('div'); el.id='contBtnBar'; el.className='cont-btnbar'; document.body.appendChild(el); }
+  el.innerHTML=`<button class="cont-btn" id="contBtnGo">Продолжить →</button>`;
+  requestAnimationFrame(()=>el.classList.add('on'));
+  _pendingCleanup=removeContinueButton;
+  $('contBtnGo').onclick=()=>{ haptic('light'); removeContinueButton(); advance(); };
+}
+function removeContinueButton(){
+  _pendingCleanup=null;
+  const el=document.getElementById('contBtnBar');
+  if(el){ el.classList.remove('on'); setTimeout(()=>{ if(el&&el.parentNode) el.remove(); },200); }
 }
 
 /* --- 1) FLIP card (recall) --- */
@@ -1083,38 +1216,51 @@ function exFlip(card){
   };
 }
 
-/* --- 2) CHOICE: 4 options, direction random --- */
+/* --- 2) CHOICE: 4 options, three random directions --- */
 function distractors(card, key, n){
   let pool=session.deck.cards.filter(c=>c.id!==card.id);
   if(pool.length<n) pool=pool.concat(allCards().filter(c=>c.id!==card.id));
   const seen=new Set([card[key]]); const out=[];
   shuffle(pool);
-  for(const c of pool){ if(seen.has(c[key])) continue; seen.add(c[key]); out.push(c); if(out.length>=n) break; }
+  for(const c of pool){ if(seen.has(c[key])||!c[key]) continue; seen.add(c[key]); out.push(c); if(out.length>=n) break; }
+  // добор, если по этому ключу не хватило уникальных вариантов
+  if(out.length<n){ for(const c of pool){ if(out.indexOf(c)>-1) continue; out.push(c); if(out.length>=n) break; } }
   return out;
 }
 function exChoice(card){
   const s=session;
-  const ru2cn = Math.random()<0.5;                 // direction
-  const key = ru2cn ? 'hanzi' : 'translation';
+  // три направления: ru — выбрать перевод; hz — выбрать иероглифы; py — выбрать пиньинь
+  const r=Math.random();
+  const mode = r<1/3 ? 'ru' : (r<2/3 ? 'hz' : 'py');
+  const key = mode==='hz' ? 'hanzi' : (mode==='py' ? 'pinyin' : 'translation');
   const opts = shuffle([card, ...distractors(card, key, 3)]);
-  const prompt = ru2cn
-    ? `<div class="q-prompt"><div class="ru-big">${esc(card.translation)||'—'}</div></div>
-       <div class="q-label">Выберите слово</div>`
-    : `<div class="q-prompt"><div class="hz-big">${esc(card.hanzi)}</div>
-         <div class="py-big">${renderPinyin(cardParts(card))}</div></div>
-       <div class="q-label">Выберите перевод</div>`;
-  const optHtml = opts.map(o=>{
-    const inner = ru2cn
-      ? `<span class="o-hz">${esc(o.hanzi)}</span><span class="o-py hide">${renderPinyin(cardParts(o))}</span>`
-      : `<span class="o-ru">${esc(o.translation)||'—'}</span>`;
-    return `<button class="opt" data-id="${o.id}">${inner}</button>`;
-  }).join('');
-  studyShell(`${prompt}<div class="options ${ru2cn?'cols2':'col1'}">${optHtml}</div>
+
+  let prompt, label, colClass, optHtml, postReveal=()=>{};
+  if(mode==='hz'){
+    // дан перевод → выбрать иероглифы (пиньинь скрыт до ответа)
+    prompt=`<div class="q-prompt"><div class="ru-big">${esc(card.translation)||'—'}</div></div>`;
+    label='Выберите слово'; colClass='cols2';
+    optHtml=opts.map(o=>`<button class="opt" data-id="${o.id}"><span class="o-hz">${esc(o.hanzi)}</span><span class="o-py hide">${renderPinyin(cardParts(o))}</span></button>`).join('');
+    postReveal=()=>root.querySelectorAll('.opt.correct .o-py,.opt.wrong .o-py').forEach(p=>p.classList.remove('hide'));
+  } else if(mode==='py'){
+    // даны иероглифы → выбрать пиньинь
+    prompt=`<div class="q-prompt"><div class="hz-big">${esc(card.hanzi)}</div></div>`;
+    label='Выберите пиньинь'; colClass='cols2';
+    optHtml=opts.map(o=>`<button class="opt pyopt" data-id="${o.id}"><span class="o-py">${renderPinyin(cardParts(o))}</span></button>`).join('');
+  } else {
+    // даны иероглифы (+пиньинь) → выбрать перевод
+    prompt=`<div class="q-prompt"><div class="hz-big">${esc(card.hanzi)}</div>
+         <div class="py-big">${renderPinyin(cardParts(card))}</div></div>`;
+    label='Выберите перевод'; colClass='col1';
+    optHtml=opts.map(o=>`<button class="opt" data-id="${o.id}"><span class="o-ru">${esc(o.translation)||'—'}</span></button>`).join('');
+  }
+
+  studyShell(`${prompt}<div class="q-label">${label}</div><div class="options ${colClass}">${optHtml}</div>
     <button class="dunno" id="dunnoBtn">Не знаю</button>`);
   const revealChoice=()=>{
     const correctBtn = root.querySelector(`.opt[data-id="${card.id}"]`);
     if(correctBtn) correctBtn.classList.add('correct');
-    if(ru2cn) root.querySelectorAll('.opt.correct .o-py,.opt.wrong .o-py').forEach(p=>p.classList.remove('hide'));
+    postReveal();
   };
   root.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
     if(s.locked) return; s.locked=true;
@@ -1124,14 +1270,14 @@ function exChoice(card){
     if(ok){ b.classList.add('correct'); notify('success'); }
     else { b.classList.add('wrong'); haptic('medium'); }
     revealChoice();                                   // всегда показываем верный ответ
-    resolve(ok);
+    resolve(ok);                                      // неверный выбор → прежний алгоритм
   });
   $('dunnoBtn').onclick=()=>{
     if(s.locked) return; s.locked=true;
     root.querySelectorAll('.opt').forEach(x=>x.disabled=true);
     $('dunnoBtn').disabled=true;
     revealChoice();                                   // показываем верный ответ
-    haptic('medium'); resolve(false);                 // → в трудные слова
+    haptic('medium'); resolve(false, true);           // «Не знаю» → ждём кнопку «Продолжить»
   };
 }
 
@@ -1198,7 +1344,7 @@ function exBuild(card){
   }
   $('dunnoBtn').onclick=()=>{
     if(s.locked) return; s.locked=true; $('dunnoBtn').disabled=true;
-    revealAnswer(); haptic('medium'); resolve(false);               // верный ответ + в трудные слова
+    revealAnswer(); haptic('medium'); resolve(false, true);         // «Не знаю» → ждём кнопку «Продолжить»
   };
   paint();
 }
@@ -1289,6 +1435,8 @@ function Settings(){
     <div class="set-card">
       <div class="set-row"><span>Слов за один заход</span>
         <div class="stepper"><button id="bMinus">−</button><b id="batchVal">${learnBatch()}</b><button id="bPlus">+</button></div></div>
+      <div class="set-row sep"><span>Цель на день, слов</span>
+        <div class="stepper"><button id="gMinus">−</button><b id="goalVal">${dailyGoal()}</b><button id="gPlus">+</button></div></div>
       <label class="set-toggle sep">
         <span>Пиньинь на лицевой стороне карточки</span>
         <input type="checkbox" id="pyFront" ${st.pinyinFront?'checked':''}>
@@ -1309,6 +1457,9 @@ function Settings(){
   const setBatch=v=>{ st.learnBatch=Math.max(5,Math.min(30,v)); $('batchVal').textContent=st.learnBatch; persist(); haptic('sel'); };
   $('bMinus').onclick=()=>setBatch(learnBatch()-5);
   $('bPlus').onclick=()=>setBatch(learnBatch()+5);
+  const setGoal=v=>{ st.dailyGoal=Math.max(5,Math.min(100,v)); $('goalVal').textContent=st.dailyGoal; persist(); haptic('sel'); };
+  $('gMinus').onclick=()=>setGoal(dailyGoal()-5);
+  $('gPlus').onclick=()=>setGoal(dailyGoal()+5);
   $('pyFront').onchange=e=>{ st.pinyinFront=e.target.checked; persist(); haptic('sel'); };
   $('exportBtn').onclick=exportData;
   $('importBtn').onclick=importData;
